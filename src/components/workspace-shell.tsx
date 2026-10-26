@@ -31,9 +31,11 @@ import {
   X,
   GitCompareArrows,
   Info,
+  MousePointer2,
 } from "lucide-react";
 import { useDemo } from "./demo-provider";
 import { Modal } from "./ui";
+import { FeatureDescription } from "./feature-description";
 
 const navigation = [
   { href: "/", label: "Tổng quan", icon: LayoutDashboard },
@@ -62,6 +64,7 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
     serverMobileSnapshot,
   );
   const [help, setHelp] = useState(false);
+  const [features, setFeatures] = useState(false);
   const [search, setSearch] = useState(false);
   const [query, setQuery] = useState("");
   const [notifications, setNotifications] = useState(false);
@@ -105,6 +108,7 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
   const current = navigation.find((n) => n.href === pathname);
   const pending = state.invoices.filter((i) => i.status === "review").length;
   const closeHelp = useCallback(() => setHelp(false), []);
+  const closeFeatures = useCallback(() => setFeatures(false), []);
   const closeSearch = useCallback(() => {
     setSearch(false);
     setQuery("");
@@ -123,9 +127,14 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
           </span>
         </div>
         <div className="banner-actions">
+          <button disabled={!!tour} onClick={() => setFeatures(true)}>
+            <Info size={13} />
+            Mô tả tính năng
+          </button>
           <button
             onClick={() => {
               setHelp(false);
+              setFeatures(false);
               setSearch(false);
               setQuery("");
               setNotifications(false);
@@ -149,6 +158,7 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
               className="tour-start"
               onClick={() => {
                 setHelp(false);
+                setFeatures(false);
                 setSearch(false);
                 setQuery("");
                 setNotifications(false);
@@ -257,7 +267,10 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
             </div>
           </div>
         </aside>
-        <div className="workspace-main" inert={isMobile && mobileOpen}>
+        <div
+          className={`workspace-main ${pathname === "/assistant" ? "assistant-workspace" : ""}`}
+          inert={isMobile && mobileOpen}
+        >
           <header className="topbar">
             <div className="breadcrumb">
               <button
@@ -313,7 +326,7 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
             tabIndex={-1}
             ref={mainRef}
             key={epoch}
-            className="page-content"
+            className={`page-content ${pathname === "/assistant" ? "assistant-content" : ""}`}
             aria-busy={!ready}
           >
             {ready ? (
@@ -337,6 +350,7 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
             <span>Được xây dựng để khám phá.</span>
           </footer>
         </div>
+        {features && <FeatureDescription onClose={closeFeatures} />}
         {help && (
           <Modal
             title="Một dự án. Một cách thể hiện riêng."
@@ -415,6 +429,12 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
       </div>
       {tour && (
         <>
+          <div className="demo-pointer" aria-hidden="true">
+            <MousePointer2 size={27} fill="currentColor" />
+            <i />
+            <span>Đang chuẩn bị</span>
+          </div>
+          <div className="demo-keycap" aria-hidden="true" />
           <div className="tour-input-shield" />
           <section
             className="tour-controller"
@@ -422,12 +442,12 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
             aria-label="Trình diễn tự động"
           >
             <div className="tour-progress-track">
-              <span style={{ width: `${(tour.step / 6) * 100}%` }} />
+              <span style={{ width: `${(tour.step / 4) * 100}%` }} />
             </div>
             <div className="tour-controller-content">
               <span className="tour-step">
                 {tour.step}
-                <small>/ 6</small>
+                <small>/ 4</small>
               </span>
               <div aria-live="polite" aria-atomic="true">
                 <span className="tour-label">Đang trình diễn tự động</span>

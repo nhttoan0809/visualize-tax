@@ -18,6 +18,8 @@ import {
   type DemoState,
 } from "@/lib/demo-data";
 
+import { PresentationDriver } from "@/lib/presentation";
+
 interface Tour {
   step: number;
   title: string;
@@ -124,80 +126,112 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     setToast("");
     const show = (step: number, title: string, text: string) =>
       setTour({ step, title, text });
-    // Executes real DOM controls. Inert prevents human keyboard/pointer input,
-    // while programmatic click is available to this cancellable presentation.
-    const click = async (name: string) => {
-      for (let attempt = 0; attempt < 80; attempt++) {
-        if (signal.aborted) throw new DOMException("Stopped", "AbortError");
-        const el = document.querySelector<HTMLButtonElement>(
-          `[data-tour="${name}"]`,
-        );
-        if (el && !el.disabled) {
-          el.scrollIntoView({ block: "center", behavior: "instant" });
-          el.click();
-          return;
-        }
-        await delay(100, signal);
-      }
-      throw new Error(`Không tìm được bước trình diễn: ${name}`);
-    };
+    const driver = new PresentationDriver(signal);
     try {
       show(
         1,
-        "Một workspace, toàn bộ luồng thuế",
-        "Bắt đầu từ dữ liệu minh họa ban đầu. Trình diễn sẽ tự thao tác trong khoảng 30 giây.",
-      );
-      router.push("/");
-      await delay(3200, signal);
-      show(
-        2,
-        "Tiếp nhận hóa đơn",
-        "Mở hóa đơn và mô phỏng trích xuất một chứng từ mẫu. Không có file được gửi lên máy chủ.",
-      );
-      router.push("/invoices");
-      await click("upload");
-      await delay(1500, signal);
-      await click("sample");
-      await delay(2500, signal);
-      show(
-        3,
-        "Kiểm tra trước khi ghi nhận",
-        "Xem thông tin trích xuất, tổng tiền và duyệt hóa đơn để sử dụng ở các bước sau.",
-      );
-      await delay(1600, signal);
-      await click("approve");
-      await delay(1800, signal);
-      show(
-        4,
-        "Đối soát giao dịch",
-        "Ghép các hóa đơn đã duyệt với giao dịch mẫu theo tổng thanh toán. Giữ lại giao dịch chưa khớp để kiểm tra.",
-      );
-      router.push("/reconciliation");
-      await click("reconcile");
-      await delay(3400, signal);
-      show(
-        5,
-        "Tạo bản nháp tờ khai",
-        "Dùng doanh thu đã duyệt để tạo bản nháp. Thuế suất và biểu mẫu chỉ phục vụ minh họa.",
-      );
-      router.push("/declarations");
-      await click("new-declaration");
-      await delay(1600, signal);
-      await click("generate");
-      await delay(3000, signal);
-      await click("close-dialog");
-      show(
-        6,
-        "Trao đổi với trợ lý thuế",
-        "Kịch bản có sẵn tổng hợp dữ liệu hiện tại. Bạn có thể dừng và tự khám phá bất kỳ lúc nào.",
+        "Từ ảnh chụp thành hóa đơn",
+        "Đính kèm ảnh mẫu, gõ yêu cầu trích xuất và lưu hóa đơn ngay trong hội thoại.",
       );
       router.push("/assistant");
-      await click("chat-preset");
-      await delay(4200, signal);
-      if (!signal.aborted) {
+      await driver.wait('[data-tour="chat-attach"]');
+      await delay(1100, signal);
+      await driver.click('[data-tour="chat-attach"]', "Đính kèm hóa đơn");
+      await driver.click(
+        '[data-tour="chat-use-sample"]',
+        "Chọn ảnh hóa đơn mẫu",
+      );
+      await driver.type(
+        '[data-tour="chat-input"]',
+        "Trích xuất thông tin và lưu hóa đơn từ ảnh này giúp tôi.",
+      );
+      await driver.shortcut(
+        '[data-tour="chat-input"]',
+        "Enter",
+        { ctrlKey: true },
+        "Ctrl + Enter",
+      );
+      await driver.wait('[data-tour="chat-save-invoice"]');
+      await delay(1600, signal);
+      await driver.click(
+        '[data-tour="chat-save-invoice"]',
+        "Kiểm tra và lưu hóa đơn",
+      );
+      await driver.wait('[data-tour="chat-saved-invoice"]');
+      await delay(1000, signal);
+      show(
+        2,
+        "Hỏi dữ liệu, nhìn thấy bức tranh",
+        "Gõ câu hỏi về doanh thu. Trợ lý tổng hợp hóa đơn đã duyệt và trả lời kèm biểu đồ có thể kiểm tra.",
+      );
+      await driver.type(
+        '[data-tour="chat-input"]',
+        "Tổng hợp doanh thu hóa đơn của tôi và hiển thị biểu đồ theo ngày.",
+      );
+      await driver.shortcut(
+        '[data-tour="chat-input"]',
+        "Enter",
+        { ctrlKey: true },
+        "Ctrl + Enter",
+      );
+      await driver.wait('[data-tour="chat-chart"]');
+      await driver.move('[data-tour="chat-chart"]', "Xem biểu đồ doanh thu");
+      await delay(2300, signal);
+      show(
+        3,
+        "Tạo tờ khai 01/GTGT",
+        "Từ yêu cầu trong hội thoại, tạo bản nháp minh họa rồi mở biểu mẫu để kiểm tra thông tin.",
+      );
+      await driver.type(
+        '[data-tour="chat-input"]',
+        "Tạo tờ khai thuế 01/GTGT cho tháng 10/2026.",
+      );
+      await driver.shortcut(
+        '[data-tour="chat-input"]',
+        "Enter",
+        { ctrlKey: true },
+        "Ctrl + Enter",
+      );
+      await driver.wait('[data-tour="chat-preview-01-GTGT"]');
+      await driver.click(
+        '[data-tour="chat-preview-01-GTGT"]',
+        "Mở bản nháp 01/GTGT",
+      );
+      await driver.wait('[data-tour="close-dialog"]');
+      await delay(2000, signal);
+      await driver.click('[data-tour="close-dialog"]', "Quay lại hội thoại");
+      show(
+        4,
+        "Tạo tờ khai 02/CNKD",
+        "Tiếp tục với mẫu 02/CNKD trong cùng hội thoại. Hai bản nháp được lưu trong workspace, chưa gửi đi đâu.",
+      );
+      await driver.type(
+        '[data-tour="chat-input"]',
+        "Tạo tờ khai thuế 02/CNKD cho hộ kinh doanh của tôi.",
+      );
+      await driver.shortcut(
+        '[data-tour="chat-input"]',
+        "Enter",
+        { ctrlKey: true },
+        "Ctrl + Enter",
+      );
+      await driver.wait('[data-tour="chat-preview-02-CNKD"]');
+      await driver.click(
+        '[data-tour="chat-preview-02-CNKD"]',
+        "Mở bản nháp 02/CNKD",
+      );
+      await driver.wait('[data-tour="close-dialog"]');
+      await delay(2200, signal);
+      await driver.click(
+        '[data-tour="close-dialog"]',
+        "Hoàn tất bốn tình huống",
+      );
+      if (!signal.aborted && abortRef.current === controller) {
         setTour(null);
         abortRef.current = null;
-        notify("Trình diễn hoàn tất. Workspace sẵn sàng để bạn khám phá.");
+        notify(
+          "Đã trình diễn đủ 4 tình huống. Bạn có thể tiếp tục khám phá hội thoại.",
+        );
       }
     } catch (error) {
       if (!signal.aborted) {
@@ -210,6 +244,8 @@ export function DemoProvider({ children }: { children: ReactNode }) {
             : "Trình diễn bị gián đoạn. Bạn có thể chạy lại.",
         );
       }
+    } finally {
+      driver.cleanup();
     }
   }
   return (

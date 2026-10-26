@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="720" viewBox="0 0 560 720">
+<rect width="560" height="720" rx="12" fill="#fffdf8"/><rect x="26" y="26" width="508" height="668" rx="4" fill="none" stroke="#dce6dc"/>
+<g font-family="Arial,sans-serif" fill="#385c4f"><text x="54" y="72" font-size="22" font-weight="bold">XƯỞNG GIẤY NHỎ</text><text x="54" y="96" font-size="12">Cửa hàng hư cấu · Dữ liệu minh họa</text>
+<path d="M54 118H506" stroke="#d5e1d8"/><text x="280" y="167" text-anchor="middle" font-size="24" font-weight="bold">HÓA ĐƠN BÁN HÀNG</text><text x="280" y="194" text-anchor="middle" font-size="13">Số 0000129 · Ngày 25/10/2026</text>
+<text x="54" y="245" font-size="12">Khách hàng: Hộ kinh doanh Trần Minh (mẫu)</text><text x="54" y="269" font-size="12">Mã số thuế mẫu: 0000000000</text>
+<rect x="54" y="306" width="452" height="38" fill="#edf4ed"/><text x="66" y="331" font-size="12" font-weight="bold">Nội dung</text><text x="492" y="331" text-anchor="end" font-size="12" font-weight="bold">Thành tiền</text>
+<text x="66" y="379" font-size="13">Sản phẩm giấy thủ công</text><text x="492" y="379" text-anchor="end" font-size="14">20.000.000 đ</text><path d="M54 400H506" stroke="#e4eae3"/>
+<text x="66" y="437" font-size="13">VAT minh họa (10%)</text><text x="492" y="437" text-anchor="end" font-size="14">2.000.000 đ</text><path d="M54 459H506" stroke="#d5e1d8"/>
+<text x="66" y="501" font-size="15" font-weight="bold">Tổng thanh toán</text><text x="492" y="501" text-anchor="end" font-size="22" font-weight="bold">22.000.000 đ</text>
+<text x="280" y="565" text-anchor="middle" font-size="40" font-weight="bold" fill="#dce6dc" transform="rotate(-15 280 565)">BẢN MINH HỌA</text>
+<text x="280" y="638" text-anchor="middle" font-size="11">Không có giá trị pháp lý. Không dùng để kê khai.</text><text x="280" y="662" text-anchor="middle" font-size="11">Visualize Tax · Portfolio reconstruction</text></g></svg>

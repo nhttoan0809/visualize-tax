@@ -17,7 +17,9 @@ Xây dựng một phiên bản tái hiện **độc lập** của các luồng t
 - Next.js App Router, TypeScript strict, Tailwind CSS; dùng **pnpm** và chỉ duy trì `pnpm-lock.yaml`.
 - `src/app/`: routes, metadata, layout, style toàn cục.
 - `src/components/`: các màn hình tương tác, shell, provider và UI dùng chung.
-- `src/lib/demo-data.ts`: seed, kiểu dữ liệu, mock API, validate dữ liệu lưu.
+- `src/lib/demo-data.ts`: seed, kiểu dữ liệu, artifact hội thoại, mock API, validate dữ liệu lưu.
+- `src/lib/presentation.ts`: driver con trỏ, click, nhập ký tự và phím tắt, có hỗ trợ abort.
+- `src/app/assistant.css`: layout toàn chiều cao, thẻ kết quả hội thoại và trình diễn; đọc `design-system/visualize-tax/pages/assistant.md` trước khi chỉnh.
 - `src/components/demo-provider.tsx`: trạng thái chung, localStorage, reset, trình diễn tự động.
 - `.agents/skills/ui-ux-pro-max/`: skill cài ở phạm vi project từ `nextlevelbuilder/ui-ux-pro-max-skill`; đọc `SKILL.md` trước khi thiết kế mới hoặc sửa UI.
 - `design-system/visualize-tax/MASTER.md`: quyết định thiết kế đã chọn; không thay toàn bộ phong cách theo kết quả tìm kiếm tự động.
@@ -28,15 +30,15 @@ Xây dựng một phiên bản tái hiện **độc lập** của các luồng t
 2. Hóa đơn: tìm kiếm, lọc, sắp xếp, thêm chứng từ mẫu, kiểm tra chi tiết và duyệt. Chọn file chỉ dùng tên file; không đọc, gửi đi hoặc OCR thật.
 3. Đối soát: chỉ ghép hóa đơn đã duyệt với giao dịch mẫu có tổng thanh toán trùng khớp; giữ rõ trạng thái chưa khớp.
 4. Tờ khai: chọn biểu mẫu, kỳ mẫu và thuế suất minh họa; tổng hợp từ doanh thu đã duyệt; xem trước, in/lưu PDF bằng trình duyệt.
-5. Trợ lý: kịch bản trả lời định trước dựa trên từ khóa và trạng thái hiện tại; thông báo rõ không có AI thật.
+5. Trợ lý: workspace chiếm chiều cao viewport, vùng hội thoại cuộn riêng và composer bám đáy. Hỗ trợ ảnh hóa đơn mẫu → trích xuất → kiểm tra/lưu, hỏi dữ liệu kèm biểu đồ từ hóa đơn đã duyệt, tạo/xem trước 01/GTGT và 02/CNKD ngay trong hội thoại. Phản hồi và công thức là mô phỏng; thông báo rõ không có AI thật.
 
 ## Trạng thái, cảnh báo và trình diễn
 
 - Banner cảnh báo phiên bản tái hiện phải luôn sticky trên cùng ở mọi route; không được cho ẩn vĩnh viễn.
-- Banner chứa **Đặt lại** và **Chạy trình diễn / Dừng trình diễn**.
+- Banner chứa **Mô tả tính năng**, **Đặt lại** và **Chạy trình diễn / Dừng trình diễn**.
 - Đặt lại khôi phục toàn bộ seed, hội thoại, đối soát, bản nháp, hộp thoại, bộ lọc và thao tác đang chờ. Chỉ xóa key của ứng dụng, không gọi `localStorage.clear()`.
 - LocalStorage phải có version, validation và fallback khi dữ liệu hỏng hoặc bị chặn. Không lưu nội dung file người dùng.
-- Trình diễn phải thực hiện các thao tác trong trình duyệt, tạm khóa tương tác ứng dụng bằng `inert` và lớp chặn pointer; luôn giữ nút dừng và phím Escape hoạt động.
+- Trình diễn tập trung bốn case trong Trợ lý thuế: ảnh hóa đơn → trích xuất/lưu; câu hỏi kèm biểu đồ; 01/GTGT; 02/CNKD. Có con trỏ minh họa di chuyển, click, gõ từng ký tự và phím tắt. Phải gọi handler giao diện thay vì thay trực tiếp kết quả trạng thái. Trình diễn phải thực hiện các thao tác trong trình duyệt, tạm khóa tương tác ứng dụng bằng `inert` và lớp chặn pointer; luôn giữ nút dừng và phím Escape hoạt động.
 - Mọi timer/request mô phỏng phải được hủy khi reset, dừng trình diễn hoặc unmount. Dừng phải trả quyền tương tác ngay.
 - Tôn trọng `prefers-reduced-motion`; giữ focus nhìn thấy, tên truy cập cho nút icon, keyboard navigation, nhãn form và trạng thái đang xử lý.
 

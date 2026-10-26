@@ -158,7 +158,26 @@ test("reset clears app state, filters and pending extraction while preserving un
 test("complete automated presentation unlocks and carries data across every step", async ({
   page,
 }) => {
+  test.setTimeout(90000);
+  await page.emulateMedia({ reducedMotion: "no-preference" });
   await ready(page, "/declarations");
+  await page.evaluate(() => {
+    const record = { typed: 0, shortcuts: 0, moves: 0, clicks: [] as string[] };
+    Object.assign(window, { presentationRecord: record });
+    document.addEventListener("input", (e) => {
+      if ((e.target as HTMLElement)?.id === "chat-input") record.typed++;
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.ctrlKey && e.key === "Enter") record.shortcuts++;
+    });
+    document.addEventListener("pointermove", () => record.moves++);
+    document.addEventListener("click", (e) => {
+      const name = (e.target as HTMLElement)?.closest<HTMLElement>(
+        "[data-tour]",
+      )?.dataset.tour;
+      if (name) record.clicks.push(name);
+    });
+  });
   await page
     .getByRole("button", { name: "Chạy trình diễn", exact: true })
     .click();
@@ -168,15 +187,37 @@ test("complete automated presentation unlocks and carries data across every step
   ).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Chạy trình diễn", exact: true }),
-  ).toBeVisible({ timeout: 45000 });
+  ).toBeVisible({ timeout: 70000 });
   await expect(page.locator(".application")).not.toHaveAttribute("inert", "");
   await expect(page.getByRole("log")).toContainText("98.500.000");
   const state = await page.evaluate(() =>
     JSON.parse(localStorage.getItem("visualize-tax:demo:v1")!),
   );
   expect(state.invoices).toHaveLength(7);
-  expect(state.declarations).toHaveLength(1);
-  expect(state.matchedIds).toHaveLength(5);
+  expect(state.declarations).toHaveLength(2);
+  expect(state.matchedIds).toHaveLength(3);
+  expect(
+    state.declarations.map((d: { form: string }) => d.form).sort(),
+  ).toEqual(["01/GTGT", "02/CNKD"]);
+  const record = await page.evaluate(
+    () =>
+      (
+        window as unknown as {
+          presentationRecord: {
+            typed: number;
+            shortcuts: number;
+            moves: number;
+            clicks: string[];
+          };
+        }
+      ).presentationRecord,
+  );
+  expect(record.typed).toBeGreaterThan(100);
+  expect(record.shortcuts).toBe(4);
+  expect(record.moves).toBeGreaterThan(8);
+  expect(record.clicks).toContain("chat-use-sample");
+  expect(record.clicks).toContain("chat-save-invoice");
+  await expect(page.locator(".demo-pointer")).toHaveCount(0);
 });
 
 test("presentation can stop during extraction and Escape immediately returns interaction", async ({
@@ -186,9 +227,9 @@ test("presentation can stop during extraction and Escape immediately returns int
   await page
     .getByRole("button", { name: "Chạy trình diễn", exact: true })
     .click();
-  await expect(
-    page.getByRole("status").filter({ hasText: /Đang mô phỏng/ }),
-  ).toBeVisible({ timeout: 15000 });
+  await expect(page.locator(".chat-processing [role=status]")).toBeVisible({
+    timeout: 15000,
+  });
   await page
     .getByRole("button", { name: "Dừng trình diễn", exact: true })
     .first()

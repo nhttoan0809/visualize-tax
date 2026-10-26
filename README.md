@@ -24,20 +24,25 @@ pnpm start
 
 ## Trải nghiệm chính
 
-| Màn hình                     | Tính năng                                                                                           |
-| ---------------------------- | --------------------------------------------------------------------------------------------------- |
-| `/` — Tổng quan              | Chỉ số từ trạng thái hiện tại, biểu đồ mẫu có đổi kỳ/xem bảng số liệu, hóa đơn gần đây, xuất CSV    |
-| `/invoices` — Hóa đơn        | Tìm kiếm, lọc, sắp xếp, kéo thả/chọn file, trích xuất mẫu, xem chi tiết và duyệt                    |
-| `/reconciliation` — Đối soát | Ghép hóa đơn đã duyệt với giao dịch mẫu theo tổng thanh toán; lọc đã khớp/chưa khớp                 |
-| `/declarations` — Tờ khai    | Chọn 01/GTGT hoặc 01/CNKD, chọn kỳ mẫu và thuế suất minh họa, tạo bản nháp, xem trước và in/lưu PDF |
-| `/assistant` — Trợ lý thuế   | Câu hỏi gợi ý, hội thoại theo kịch bản, tổng hợp dữ liệu hiện tại; không kết nối AI                 |
+| Màn hình                     | Tính năng                                                                                                                  |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `/` — Tổng quan              | Chỉ số từ trạng thái hiện tại, biểu đồ mẫu có đổi kỳ/xem bảng số liệu, hóa đơn gần đây, xuất CSV                           |
+| `/invoices` — Hóa đơn        | Tìm kiếm, lọc, sắp xếp, kéo thả/chọn file, trích xuất mẫu, xem chi tiết và duyệt                                           |
+| `/reconciliation` — Đối soát | Ghép hóa đơn đã duyệt với giao dịch mẫu theo tổng thanh toán; lọc đã khớp/chưa khớp                                        |
+| `/declarations` — Tờ khai    | Chọn 01/GTGT, 01/CNKD hoặc 02/CNKD, chọn kỳ mẫu và thuế suất minh họa, tạo bản nháp, xem trước và in/lưu PDF               |
+| `/assistant` — Trợ lý thuế   | Workspace toàn chiều cao, đính kèm ảnh hóa đơn mẫu, lưu chứng từ, phản hồi có biểu đồ và tạo bản nháp ngay trong hội thoại |
 
 Banner cố định ở mọi trang gồm:
 
 - **Đặt lại:** khôi phục seed, xóa hội thoại/bản nháp, hủy thao tác đang xử lý và đưa về tổng quan. Không xóa dữ liệu của ứng dụng khác.
-- **Chạy trình diễn:** tự thao tác qua toàn bộ luồng trong khoảng 25–30 giây, bắt đầu từ seed. Vùng ứng dụng tạm khóa tương tác; nút dừng và phím Escape luôn hoạt động. Dữ liệu đã hoàn tất được giữ lại khi dừng.
+- **Mô tả tính năng:** trình bày bài toán quản lý hóa đơn, đối chiếu dòng tiền, phân tích và hỗ trợ kê khai; phân biệt định hướng nghiệp vụ với các tích hợp đang được mô phỏng.
+- **Chạy trình diễn:** bắt đầu từ seed và chạy bốn tình huống trong Trợ lý thuế: đính kèm ảnh → trích xuất và lưu hóa đơn; hỏi doanh thu kèm biểu đồ; tạo 01/GTGT; tạo 02/CNKD. Con trỏ minh họa di chuyển giữa các điều khiển, click, gõ từng ký tự và gửi bằng `Ctrl + Enter`. Thao tác gọi chính các handler của giao diện; đây là mô phỏng trong trang web, không điều khiển chuột hệ điều hành. Vùng ứng dụng tạm khóa tương tác; nút dừng và phím Escape luôn hoạt động. Dữ liệu đã hoàn tất được giữ lại khi dừng.
 
-Tìm nhanh bằng nút trên thanh đầu trang hoặc `⌘ K` / `Ctrl K`. Menu mobile hỗ trợ bàn phím và Escape. Các animation tôn trọng `prefers-reduced-motion`.
+Tìm nhanh bằng nút trên thanh đầu trang hoặc `⌘ K` / `Ctrl K`. Menu mobile hỗ trợ bàn phím và Escape. Các animation tôn trọng `prefers-reduced-motion`. Trong Trợ lý, `Alt + I` mở đính kèm; `Enter` hoặc `Ctrl + Enter` gửi tin, `Shift + Enter` xuống dòng.
+
+![Giao diện Trợ lý thuế](docs/assistant-desktop.png)
+
+![Phản hồi doanh thu kèm biểu đồ trong hội thoại](docs/assistant-results.png)
 
 ## Dữ liệu và giới hạn
 
@@ -45,8 +50,8 @@ Tìm nhanh bằng nút trên thanh đầu trang hoặc `⌘ K` / `Ctrl K`. Menu 
 - Mock API là facade bất đồng bộ chạy trong trình duyệt, có độ trễ và hỗ trợ hủy; không có API nghiệp vụ máy chủ.
 - Trạng thái được lưu với schema version tại key `visualize-tax:demo:v1`. Dữ liệu hỏng hoặc storage bị chặn sẽ dùng seed/in-memory.
 - File người dùng chọn **chỉ cung cấp tên chứng từ**. Nội dung không được đọc hoặc gửi đi. Mọi lần trích xuất đều trả hóa đơn mẫu “Xưởng Giấy Nhỏ”; nhập lại sẽ thay bản mẫu này.
-- Tổng quan lấy chỉ số từ trạng thái thực của demo. Biểu đồ dòng tiền là bộ dữ liệu xu hướng riêng, được ghi nhãn mẫu.
-- Thuế minh họa = doanh thu hóa đơn đã duyệt × tỷ lệ do người xem chọn. Không thực hiện khấu trừ, tra cứu pháp luật hoặc tính nghĩa vụ thuế thực tế. Các kỳ tờ khai dùng cùng bộ hóa đơn mẫu.
+- Tổng quan lấy chỉ số từ trạng thái thực của demo. Biểu đồ dòng tiền ở Tổng quan là dữ liệu xu hướng riêng; biểu đồ trong Trợ lý được tính trực tiếp từ hóa đơn đã duyệt tại thời điểm trả lời và lưu cùng hội thoại.
+- Thuế minh họa = doanh thu hóa đơn đã duyệt × tỷ lệ mô phỏng. Ở trang Tờ khai, người xem chọn tỷ lệ; kịch bản hội thoại dùng 10% cho 01/GTGT và 1,5% cho CNKD để minh họa phép tính, không xác định mức thuế áp dụng. Không thực hiện khấu trừ, tra cứu pháp luật hoặc tính nghĩa vụ thuế thực tế. Các kỳ tờ khai dùng cùng bộ hóa đơn mẫu.
 - Nút **In / Lưu PDF** mở hộp thoại in của trình duyệt; mẫu in luôn có thông báo không có giá trị pháp lý.
 - Không có đăng ký/đăng nhập, OTP, database, thanh toán, tích hợp ngân hàng hay model AI thật.
 
@@ -83,7 +88,13 @@ pnpm build
 pnpm format:check
 ```
 
-Bộ kiểm thử chạy trên desktop 1440 px và mobile 375 px, bao gồm luồng liên thông, persist sau reload, reset và hủy tác vụ, trình diễn hoàn tất/dừng/Escape, storage bị lỗi/bị chặn, kiểm tra file, responsive, sticky banner và kiểm tra accessibility tự động. Playwright dùng port 3002 và tự chạy dev server nếu chưa có. Báo cáo tạo ở `playwright-report/` (được gitignore).
+Bộ kiểm thử chạy trên desktop 1440 px và mobile 375 px, bao gồm luồng liên thông, persist sau reload, reset và hủy tác vụ, trình diễn hoàn tất/dừng/Escape, storage bị lỗi/bị chặn, kiểm tra file, responsive, sticky banner và kiểm tra accessibility tự động. Playwright dùng port 3002 và tự chạy dev server nếu chưa có. Báo cáo tạo ở `playwright-report/` (được gitignore). Nếu đã chạy dev server ở cổng khác, dùng đúng hostname đã khởi động:
+
+```sh
+PLAYWRIGHT_BASE_URL=http://localhost:3000 pnpm test:e2e
+```
+
+Biến này chỉ cấu hình URL kiểm thử và không yêu cầu một server thứ hai. Kiểm thử trình diễn chạy cả chuyển động/gõ ký tự bình thường và xác nhận đủ bốn tình huống.
 
 ## GitHub và Vercel
 

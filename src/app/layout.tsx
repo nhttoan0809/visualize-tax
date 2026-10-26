@@ -10,6 +10,7 @@ import "@fontsource/be-vietnam-pro/latin-500.css";
 import "@fontsource/be-vietnam-pro/latin-600.css";
 import "@fontsource/be-vietnam-pro/latin-700.css";
 import "./globals.css";
+import "./assistant.css";
 export const metadata: Metadata = {
   title: {
     default: "Visualize Tax · Không gian quản lý thuế",

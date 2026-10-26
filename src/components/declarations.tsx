@@ -11,6 +11,7 @@ import {
   Printer,
   Sparkles,
 } from "lucide-react";
+import { DeclarationDocument } from "./declaration-document";
 import { useDemo } from "./demo-provider";
 import { money, mockApi, type Declaration } from "@/lib/demo-data";
 import { Modal, Spinner } from "./ui";
@@ -194,7 +195,7 @@ export function Declarations() {
             <fieldset>
               <legend>Chọn biểu mẫu</legend>
               <div className="form-type-options">
-                {(["01/GTGT", "01/CNKD"] as const).map((f) => (
+                {(["01/GTGT", "01/CNKD", "02/CNKD"] as const).map((f) => (
                   <label key={f} className={form === f ? "checked" : ""}>
                     <input
                       type="radio"
@@ -300,73 +301,7 @@ export function Declarations() {
           wide
           locked={!!tour}
         >
-          <div className="declaration-document print-document">
-            <div className="document-watermark">BẢN MINH HỌA</div>
-            <div className="declaration-document-top">
-              <span className="document-brand">visualize tax.</span>
-              <span>Mẫu {preview.form}</span>
-            </div>
-            <h3>BẢN TỔNG HỢP TỜ KHAI THUẾ</h3>
-            <p className="document-period">{preview.period}</p>
-            <div className="document-rule" />
-            <dl className="declaration-business">
-              <div>
-                <dt>Người nộp thuế mẫu</dt>
-                <dd>Hộ kinh doanh Trần Minh</dd>
-              </div>
-              <div>
-                <dt>Mã số thuế mẫu</dt>
-                <dd>0000000000</dd>
-              </div>
-              <div>
-                <dt>Địa chỉ mẫu</dt>
-                <dd>Không gian trải nghiệm Visualize Tax</dd>
-              </div>
-            </dl>
-            <table className="declaration-values">
-              <thead>
-                <tr>
-                  <th>Chỉ tiêu minh họa</th>
-                  <th className="text-right">Giá trị</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Doanh thu từ hóa đơn đã duyệt</td>
-                  <td>{money(preview.revenue)}</td>
-                </tr>
-                <tr>
-                  <td>Thuế suất minh họa do người dùng chọn</td>
-                  <td>{preview.rate}%</td>
-                </tr>
-                <tr className="declaration-tax">
-                  <td>Tổng thuế minh họa</td>
-                  <td>{money(preview.tax)}</td>
-                </tr>
-              </tbody>
-            </table>
-            <div className="document-disclaimer">
-              <CircleAlert size={18} />
-              <p>
-                Tài liệu được tạo từ dữ liệu hư cấu nhằm trình diễn UI/UX. Không
-                có giá trị pháp lý, không phải biểu mẫu kê khai chính thức và
-                chưa được nộp đến bất kỳ cơ quan nào.
-              </p>
-            </div>
-            <div className="document-signature">
-              <span>
-                Ngày tạo:{" "}
-                {new Date(preview.createdAt).toLocaleDateString("vi-VN", {
-                  timeZone: "Asia/Ho_Chi_Minh",
-                })}
-              </span>
-              <span>
-                Hệ thống minh họa
-                <br />
-                <strong>Visualize Tax</strong>
-              </span>
-            </div>
-          </div>
+          <DeclarationDocument declaration={preview} />
           <div className="modal-actions">
             <button className="button secondary" onClick={close}>
               Đóng

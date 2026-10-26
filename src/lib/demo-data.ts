@@ -12,17 +12,31 @@ export interface Invoice {
 }
 export interface Declaration {
   id: string;
-  form: "01/GTGT" | "01/CNKD";
+  form: "01/GTGT" | "01/CNKD" | "02/CNKD";
   period: string;
   revenue: number;
   rate: number;
   tax: number;
   createdAt: string;
 }
+export interface ChartPoint {
+  label: string;
+  revenue: number;
+}
+export type MessageArtifact =
+  | { type: "invoice"; invoice: Invoice }
+  | { type: "chart"; points: ChartPoint[]; total: number; count: number }
+  | { type: "declaration"; declarationId: string };
+export interface ChatAttachment {
+  name: string;
+  kind: "image" | "document";
+}
 export interface Message {
   id: string;
   role: "user" | "assistant";
   text: string;
+  attachment?: ChatAttachment;
+  artifact?: MessageArtifact;
 }
 export interface DemoState {
   version: 1;
@@ -254,7 +268,7 @@ export const mockApi = {
     if (/đối soát|ngân hàng/.test(q))
       return "Luồng đối soát mẫu gồm 3 bước:\n\n1. Duyệt thông tin hóa đơn.\n2. So khớp tổng thanh toán với giao dịch ngân hàng mẫu.\n3. Kiểm tra các giao dịch chưa khớp.\n\nMở mục Đối soát và chọn ‘Chạy đối soát’ để trải nghiệm. Không có kết nối ngân hàng thực tế.";
     if (/tờ khai|thuế|gtgt|tncn/.test(q))
-      return "Bạn có thể thử tạo bản nháp 01/GTGT hoặc 01/CNKD tại mục Tờ khai. Doanh thu được lấy từ các hóa đơn đã duyệt; thuế suất là tham số minh họa có thể chỉnh sửa.\n\nBản nháp có thể xem trước và in / lưu PDF bằng trình duyệt. Đây là kịch bản có sẵn, không phải tư vấn thuế hay biểu mẫu dùng để nộp hồ sơ.";
+      return "Bạn có thể thử tạo bản nháp 01/GTGT, 01/CNKD hoặc 02/CNKD tại mục Tờ khai. Doanh thu được lấy từ các hóa đơn đã duyệt; thuế suất là tham số minh họa có thể chỉnh sửa.\n\nBản nháp có thể xem trước và in / lưu PDF bằng trình duyệt. Đây là kịch bản có sẵn, không phải tư vấn thuế hay biểu mẫu dùng để nộp hồ sơ.";
     return "Tôi đang chạy kịch bản trả lời minh họa. Bạn có thể hỏi về ‘doanh thu hóa đơn’, ‘đối soát ngân hàng’ hoặc ‘tạo tờ khai’ để khám phá các luồng trong workspace. Không có mô hình AI thực tế được kết nối.";
   },
 };
@@ -294,7 +308,7 @@ export function isDemoState(value: unknown): value is DemoState {
       (d) =>
         d &&
         typeof d.id === "string" &&
-        ["01/GTGT", "01/CNKD"].includes(d.form) &&
+        ["01/GTGT", "01/CNKD", "02/CNKD"].includes(d.form) &&
         typeof d.period === "string" &&
         Number.isFinite(d.revenue) &&
         d.revenue >= 0 &&
@@ -313,7 +327,67 @@ export function isDemoState(value: unknown): value is DemoState {
         m &&
         typeof m.id === "string" &&
         typeof m.text === "string" &&
-        ["user", "assistant"].includes(m.role),
+        ["user", "assistant"].includes(m.role) &&
+        (!m.attachment ||
+          (typeof m.attachment.name === "string" &&
+            ["image", "document"].includes(m.attachment.kind))) &&
+        (!m.artifact || validArtifact(m.artifact)),
     )
   );
+}
+
+function validArtifact(artifact: MessageArtifact): boolean {
+  if (artifact.type === "declaration")
+    return typeof artifact.declarationId === "string";
+  if (artifact.type === "chart")
+    return (
+      Number.isFinite(artifact.total) &&
+      artifact.total >= 0 &&
+      Number.isFinite(artifact.count) &&
+      Array.isArray(artifact.points) &&
+      artifact.points.length <= 100 &&
+      artifact.points.every(
+        (p) =>
+          typeof p.label === "string" &&
+          Number.isFinite(p.revenue) &&
+          p.revenue >= 0,
+      )
+    );
+  if (artifact.type === "invoice") {
+    const invoice = artifact.invoice;
+    return (
+      !!invoice &&
+      typeof invoice.id === "string" &&
+      typeof invoice.name === "string" &&
+      typeof invoice.number === "string" &&
+      typeof invoice.source === "string" &&
+      typeof invoice.date === "string" &&
+      typeof invoice.category === "string" &&
+      Number.isFinite(invoice.amount) &&
+      invoice.amount >= 0 &&
+      Number.isFinite(invoice.vat) &&
+      invoice.vat >= 0 &&
+      ["review", "approved"].includes(invoice.status)
+    );
+  }
+  return false;
+}
+export function invoiceChart(
+  invoices: Invoice[],
+): Extract<MessageArtifact, { type: "chart" }> {
+  const approved = invoices.filter((i) => i.status === "approved");
+  const days = new Map<string, number>();
+  for (const invoice of approved)
+    days.set(invoice.date, (days.get(invoice.date) ?? 0) + invoice.amount);
+  return {
+    type: "chart",
+    count: approved.length,
+    total: approved.reduce((sum, i) => sum + i.amount, 0),
+    points: [...days.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([date, revenue]) => ({
+        label: dateLabel(date).slice(0, 5),
+        revenue,
+      })),
+  };
 }
