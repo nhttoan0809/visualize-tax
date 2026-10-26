@@ -166,6 +166,24 @@ textarea {
   color: #68450f;
   padding-inline: 10px;
 }
+.banner-actions .tour-start {
+  background: var(--primary);
+  color: #fff;
+  font-weight: 600;
+  box-shadow:
+    0 2px 5px #075e5026,
+    0 0 0 2px #ffffff80;
+}
+.banner-actions .tour-start:hover:not(:disabled) {
+  background: var(--primary-dark);
+  box-shadow:
+    0 3px 9px #075e5033,
+    0 0 0 2px #ffffffb3;
+  transform: translateY(-1px);
+}
+.banner-actions .tour-start:active:not(:disabled) {
+  transform: translateY(0);
+}
 .banner-separator {
   height: 13px;
   width: 1px;
