@@ -152,7 +152,20 @@ export function DemoProvider({ children }: { children: ReactNode }) {
         "Ctrl + Enter",
       );
       await driver.wait('[data-tour="chat-save-invoice"]');
-      await delay(1600, signal);
+      await driver.click(
+        '[data-tour="chat-view-invoice"]',
+        "Mở hóa đơn để kiểm tra từng mặt hàng",
+      );
+      await driver.wait('[data-tour="invoice-detail"]');
+      await driver.move(
+        ".document-lines",
+        "Đối chiếu số lượng, đơn giá và thành tiền",
+      );
+      await delay(2000, signal);
+      await driver.click(
+        '[data-tour="close-dialog"]',
+        "Trở lại kết quả trích xuất",
+      );
       await driver.click(
         '[data-tour="chat-save-invoice"]',
         "Kiểm tra và lưu hóa đơn",
@@ -198,7 +211,16 @@ export function DemoProvider({ children }: { children: ReactNode }) {
         "Mở bản nháp 01/GTGT",
       );
       await driver.wait('[data-tour="close-dialog"]');
-      await delay(2000, signal);
+      await driver.move(
+        '[data-tour="declaration-calculation"]',
+        "Kiểm tra thuế đầu ra trừ thuế đầu vào",
+      );
+      await delay(1800, signal);
+      await driver.click(
+        '[data-tour="declaration-source"]',
+        "Xem hóa đơn nguồn của tờ khai",
+      );
+      await delay(1500, signal);
       await driver.click('[data-tour="close-dialog"]', "Quay lại hội thoại");
       show(
         4,
@@ -221,6 +243,10 @@ export function DemoProvider({ children }: { children: ReactNode }) {
         "Mở bản nháp 02/CNKD",
       );
       await driver.wait('[data-tour="close-dialog"]');
+      await driver.move(
+        '[data-tour="declaration-indicators"]',
+        "Kiểm tra doanh thu, GTGT và TNCN của mẫu TMĐT",
+      );
       await delay(2200, signal);
       await driver.click(
         '[data-tour="close-dialog"]',

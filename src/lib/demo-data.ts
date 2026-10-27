@@ -1,3 +1,5 @@
+import { purchaseLedger } from "./document-data";
+
 export type InvoiceStatus = "review" | "approved";
 export interface Invoice {
   id: string;
@@ -18,6 +20,10 @@ export interface Declaration {
   rate: number;
   tax: number;
   createdAt: string;
+  sources?: Invoice[];
+  inputVat?: number;
+  inputAmount?: number;
+  carriedCredit?: number;
 }
 export interface ChartPoint {
   label: string;
@@ -245,12 +251,34 @@ export const mockApi = {
   async createDeclaration(
     input: Pick<Declaration, "form" | "period" | "revenue" | "rate">,
     signal?: AbortSignal,
+    invoices?: Invoice[],
   ): Promise<Declaration> {
     await delay(1100, signal);
+    const inputVat =
+      input.form === "01/GTGT"
+        ? purchaseLedger.reduce((sum, i) => sum + i.vat, 0)
+        : 0;
+    const inputAmount =
+      input.form === "01/GTGT"
+        ? purchaseLedger.reduce((sum, i) => sum + i.amount, 0)
+        : 0;
     return {
       ...input,
+      ...(invoices
+        ? {
+            sources: structuredClone(
+              invoices.filter((i) => i.status === "approved"),
+            ),
+          }
+        : {}),
+      inputVat,
+      inputAmount,
+      carriedCredit: 0,
       id: crypto.randomUUID(),
-      tax: Math.round((input.revenue * input.rate) / 100),
+      tax: Math.max(
+        0,
+        Math.round((input.revenue * input.rate) / 100) - inputVat,
+      ),
       createdAt: new Date().toISOString(),
     };
   },
@@ -263,7 +291,7 @@ export const mockApi = {
     const q = question.toLocaleLowerCase("vi-VN");
     if (/hóa đơn|hoá đơn|doanh thu/.test(q)) {
       const approved = invoices.filter((i) => i.status === "approved");
-      return `Trong bộ dữ liệu minh họa có ${invoices.length} hóa đơn, ${approved.length} hóa đơn đã duyệt. Tổng doanh thu đã duyệt là ${money(approved.reduce((sum, i) => sum + i.amount, 0))}.\n\nBạn có thể mở Hóa đơn để kiểm tra chứng từ, sau đó sang Đối soát để ghép với giao dịch mẫu.`;
+      return `Kỳ tháng 10/2026 · Sổ doanh thu bán ra\n\nTrong bộ dữ liệu minh họa có ${invoices.length} hóa đơn, ${approved.length} hóa đơn đã duyệt. Tổng doanh thu đã duyệt là ${money(approved.reduce((sum, i) => sum + i.amount, 0))}.\n\nHóa đơn có doanh thu lớn nhất: ${approved.length ? approved.toSorted((a, b) => b.amount - a.amount)[0].name : "Chưa có"}. Tổng thuế GTGT đầu ra ghi trên chứng từ là ${money(approved.reduce((sum, i) => sum + i.vat, 0))}; tổng thanh toán là ${money(approved.reduce((sum, i) => sum + i.amount + i.vat, 0))}.\n\nCòn ${invoices.length - approved.length} hóa đơn chưa duyệt, chưa đưa vào biểu đồ. Dữ liệu phản ánh ngày lập hóa đơn, không phải dòng tiền đã thu. Mở kho Hóa đơn để kiểm tra từng chứng từ hoặc sang Đối soát để so khớp giao dịch.`;
     }
     if (/đối soát|ngân hàng/.test(q))
       return "Luồng đối soát mẫu gồm 3 bước:\n\n1. Duyệt thông tin hóa đơn.\n2. So khớp tổng thanh toán với giao dịch ngân hàng mẫu.\n3. Kiểm tra các giao dịch chưa khớp.\n\nMở mục Đối soát và chọn ‘Chạy đối soát’ để trải nghiệm. Không có kết nối ngân hàng thực tế.";
@@ -317,6 +345,18 @@ export function isDemoState(value: unknown): value is DemoState {
         Number.isFinite(d.rate) &&
         d.rate >= 0 &&
         d.rate <= 100 &&
+        (!d.sources ||
+          (Array.isArray(d.sources) &&
+            isDemoState({
+              version: 1,
+              invoices: d.sources,
+              matchedIds: [],
+              declarations: [],
+              messages: [],
+            }))) &&
+        [d.inputVat, d.inputAmount, d.carriedCredit].every(
+          (n) => n === undefined || (Number.isFinite(n) && n >= 0),
+        ) &&
         typeof d.createdAt === "string" &&
         Number.isFinite(Date.parse(d.createdAt)),
     ) &&

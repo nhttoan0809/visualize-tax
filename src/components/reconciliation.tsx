@@ -14,11 +14,13 @@ import {
 import { useDemo } from "./demo-provider";
 import { bankTransactions, money, mockApi } from "@/lib/demo-data";
 import { useTask } from "@/lib/use-task";
+import { ReconciliationInspector } from "./reconciliation-inspector";
 import { Spinner, Status } from "./ui";
 export function Reconciliation() {
   const { state, update, notify } = useDemo();
   const { busy, run } = useTask();
   const [filter, setFilter] = useState("all");
+  const [selectedId, setSelectedId] = useState("bank-03");
   const transactions = bankTransactions.filter(
     (b) =>
       b.id !== "bank-demo" || state.invoices.some((i) => i.id === "inv-demo"),
@@ -33,6 +35,8 @@ export function Reconciliation() {
         ? state.matchedIds.includes(b.invoiceId)
         : !state.matchedIds.includes(b.invoiceId)),
   );
+  const selected =
+    transactions.find((b) => b.id === selectedId) ?? transactions[0];
   return (
     <div>
       <div className="page-heading">
@@ -123,6 +127,14 @@ export function Reconciliation() {
           Kiểm tra chênh lệch
         </div>
       </div>
+      <ReconciliationInspector
+        key={selectedId}
+        transaction={selected}
+        invoice={state.invoices.find((i) => i.id === selected.invoiceId)}
+        matched={state.matchedIds.includes(selected.invoiceId)}
+        transactions={transactions}
+        onSelect={setSelectedId}
+      />
       <section className="panel">
         <div className="list-toolbar">
           <div className="tabs" role="group" aria-label="Lọc đối soát">
@@ -163,9 +175,31 @@ export function Reconciliation() {
                   ),
                   isMatched = state.matchedIds.includes(b.invoiceId);
                 return (
-                  <tr key={b.id}>
+                  <tr
+                    key={b.id}
+                    className={
+                      selectedId === b.id ? "selected-transaction" : ""
+                    }
+                  >
                     <td>
-                      <div className="bank-cell">
+                      <button
+                        className="bank-cell bank-inspect-button"
+                        aria-label={`Xem đối chiếu ${b.text}`}
+                        aria-pressed={selectedId === b.id}
+                        onClick={() => {
+                          setSelectedId(b.id);
+                          document
+                            .getElementById("reconciliation-inspector")
+                            ?.scrollIntoView({
+                              block: "start",
+                              behavior: window.matchMedia(
+                                "(prefers-reduced-motion: reduce)",
+                              ).matches
+                                ? "instant"
+                                : "smooth",
+                            });
+                        }}
+                      >
                         <span className="transaction-icon">
                           <ArrowUpRight size={17} />
                         </span>
@@ -173,7 +207,7 @@ export function Reconciliation() {
                           <strong>{b.text}</strong>
                           <small>{b.date} · Chuyển khoản mẫu</small>
                         </span>
-                      </div>
+                      </button>
                     </td>
                     <td className="text-right tabular">{money(b.amount)}</td>
                     <td className="connection-cell">

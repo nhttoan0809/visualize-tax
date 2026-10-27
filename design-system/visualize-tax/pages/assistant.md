@@ -27,3 +27,5 @@ Presentation uses a clearly visible virtual pointer over an inert application. M
 The four cases are invoice extraction/save, a revenue answer with chart, 01/GTGT, and 02/CNKD. Persist structured results in the same versioned browser store as ordinary chat. Do not persist file contents or add real OCR/AI/tax integrations.
 
 Feature explanation must distinguish the business goal (capture, organize, reconcile, query, understand tax, prepare forms) from the demo's actual scope. References to POS, payment channels or tax regulations describe goals and explicitly say those systems are not connected in this build.
+
+Invoice results offer an explicit detail action and a clickable customer name. Reuse the same detailed invoice document in the invoice repository and declaration source disclosures. Declaration previews show numbered indicators, assumptions, a calculation summary and expandable source invoices. Presentation opens the extracted invoice before saving and inspects declaration calculations and a source invoice. Scrollable ledgers must be keyboard focusable and named; preserve the modal focus trap and Escape behavior.

@@ -45,6 +45,7 @@ export function Declarations() {
         mockApi.createDeclaration(
           { form, period, revenue, rate: Number(rate) },
           signal,
+          state.invoices,
         ),
       (result) => {
         update((s) => ({
@@ -209,7 +210,9 @@ export function Declarations() {
                       <small>
                         {f === "01/GTGT"
                           ? "Thuế giá trị gia tăng"
-                          : "Thuế hộ kinh doanh"}
+                          : f === "02/CNKD"
+                            ? "Tham khảo 02/CNKD-TMĐT"
+                            : "Thuế hộ kinh doanh"}
                       </small>
                     </span>
                     {form === f && <Check size={17} />}

@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import {
   ArrowUpRight,
   Check,
@@ -17,6 +17,8 @@ import {
   type Declaration,
   type MessageArtifact,
 } from "@/lib/demo-data";
+import { Modal } from "./ui";
+import { InvoiceDocument } from "./invoice-document";
 import { useDemo } from "./demo-provider";
 
 export function InvoiceArtifact({
@@ -24,8 +26,12 @@ export function InvoiceArtifact({
 }: {
   artifact: Extract<MessageArtifact, { type: "invoice" }>;
 }) {
-  const { state, update, notify } = useDemo();
-  const invoice = artifact.invoice;
+  const { state, update, notify, tour } = useDemo();
+  const [detail, setDetail] = useState(false);
+  const closeDetail = useCallback(() => setDetail(false), []);
+  const invoice =
+    state.invoices.find((i) => i.id === artifact.invoice.id) ??
+    artifact.invoice;
   const saved = state.invoices.some(
     (i) => i.id === invoice.id && i.status === "approved",
   );
@@ -50,7 +56,14 @@ export function InvoiceArtifact({
           height={106}
         />
         <div>
-          <strong>{invoice.name}</strong>
+          <strong>
+            <button
+              className="document-title-button"
+              onClick={() => setDetail(true)}
+            >
+              {invoice.name}
+            </button>
+          </strong>
           <span>
             Hóa đơn #{invoice.number} · {dateLabel(invoice.date)}
           </span>
@@ -71,10 +84,14 @@ export function InvoiceArtifact({
         </div>
       </div>
       <div className="artifact-footer">
-        <span>
+        <button
+          className="button secondary"
+          data-tour="chat-view-invoice"
+          onClick={() => setDetail(true)}
+        >
           <ShieldCheck size={13} />
-          Kiểm tra trước khi lưu
-        </span>
+          Xem chi tiết
+        </button>
         <button
           className={`button ${saved ? "secondary" : "primary"}`}
           disabled={saved}
@@ -95,6 +112,22 @@ export function InvoiceArtifact({
           {saved ? "Đã lưu hóa đơn" : "Lưu hóa đơn"}
         </button>
       </div>
+      {detail && (
+        <Modal
+          title={`Hóa đơn #${invoice.number}`}
+          subtitle="Kiểm tra chứng từ trích xuất trong hội thoại"
+          onClose={closeDetail}
+          wide
+          locked={!!tour}
+        >
+          <InvoiceDocument invoice={invoice} />
+          <div className="modal-actions">
+            <button className="button secondary" onClick={closeDetail}>
+              Trở lại hội thoại
+            </button>
+          </div>
+        </Modal>
+      )}
     </section>
   );
 }
@@ -215,14 +248,23 @@ export function DeclarationArtifact({
       </div>
       <div className="chat-draft-summary">
         <span className="artifact-badge">Bản nháp minh họa</span>
-        <h3>Tờ khai {declaration.form}</h3>
-        <p>{declaration.period} · Hộ kinh doanh mẫu</p>
+        <h3>
+          <button className="document-title-button" onClick={onPreview}>
+            Tờ khai {declaration.form}
+          </button>
+        </h3>
+        <p>
+          {declaration.period} ·{" "}
+          {declaration.form === "01/GTGT"
+            ? "Doanh nghiệp · Khấu trừ"
+            : "Hộ kinh doanh · Bán hàng"}
+        </p>
         <div>
           <span>
             Doanh thu: <strong>{money(declaration.revenue)}</strong>
           </span>
           <span>
-            Thuế minh họa ({declaration.rate}%):{" "}
+            Thuế còn phải nộp minh họa:{" "}
             <strong>{money(declaration.tax)}</strong>
           </span>
         </div>

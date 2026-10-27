@@ -142,7 +142,7 @@ export function Assistant() {
         if (pending) {
           const invoice = await mockApi.extractInvoice(pending.name, signal);
           return {
-            text: "Tôi đã trích xuất thông tin từ hóa đơn mẫu. Bạn kiểm tra khách hàng, doanh thu và tổng thanh toán bên dưới, sau đó chọn Lưu hóa đơn để ghi nhận vào workspace.",
+            text: "Đã đọc hóa đơn 0000129, ký hiệu 1C26TMM, ngày 25/10/2026. Bên mua: Xưởng Giấy Nhỏ. Hai mặt hàng gồm 500 sổ tay A5 (14.000.000 ₫) và 1.000 túi giấy kraft (6.000.000 ₫). Tiền hàng 20.000.000 ₫, VAT minh họa 2.000.000 ₫, tổng thanh toán 22.000.000 ₫.\n\nChọn Xem chi tiết để kiểm tra bên mua, từng dòng hàng và thông tin chuyển khoản trước khi lưu. Kết quả được dựng từ ảnh mẫu, không phải OCR thực tế.",
             artifact: { type: "invoice", invoice },
           };
         }
@@ -171,9 +171,13 @@ export function Assistant() {
               rate: form === "01/GTGT" ? 10 : 1.5,
             },
             signal,
+            state.invoices,
           );
           return {
-            text: `Đã tạo bản nháp ${form} từ ${state.invoices.filter((i) => i.status === "approved").length} hóa đơn đã duyệt. Bạn có thể xem trước, kiểm tra thông tin và in / lưu PDF. Tỷ lệ ${declaration.rate}% chỉ là tham số mô phỏng, không phải mức thuế được xác định cho hộ kinh doanh.`,
+            text:
+              form === "01/GTGT"
+                ? `Đã lập bản nháp 01/GTGT cho kịch bản doanh nghiệp kê khai khấu trừ. Doanh thu bán ra ${money(revenue)}; thuế đầu ra mô phỏng ${money(Math.round((revenue * declaration.rate) / 100))}. Hai chứng từ mua vào mẫu có thuế được giả định đủ điều kiện khấu trừ ${money(declaration.inputVat ?? 0)}. Số thuế còn phải nộp minh họa: ${money(declaration.tax)}.\n\nMở bản nháp để xem các nhóm chỉ tiêu, công thức và danh sách hóa đơn nguồn. Đây là cấu trúc tham khảo TT80/2021, không tự xác định nghĩa vụ thuế thực tế.`
+                : `Đã tạo bản nháp ${form} từ ${state.invoices.filter((i) => i.status === "approved").length} hóa đơn đã duyệt, doanh thu ${money(revenue)}. ${form === "02/CNKD" ? "Tình huống này dùng cấu trúc tham khảo 02/CNKD-TMĐT (NĐ117/2025), với giả định toàn bộ doanh thu là bán hàng văn phòng phẩm trên nền tảng mẫu không có chức năng thanh toán." : "Tình huống hộ kinh doanh bán hàng mẫu."}\n\nTổng tỷ lệ mô phỏng ${declaration.rate}% được tách thành GTGT và TNCN trong bản chi tiết. Đây là kịch bản độc lập với hồ sơ doanh nghiệp của case 01/GTGT; không phải lựa chọn mẫu hay mức thuế áp dụng cho người dùng.`,
             artifact: { type: "declaration", declarationId: declaration.id },
             declaration,
           };

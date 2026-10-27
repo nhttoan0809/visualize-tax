@@ -19,6 +19,7 @@ import { useDemo } from "./demo-provider";
 import { dateLabel, money, mockApi } from "@/lib/demo-data";
 import { Modal, Spinner, Status } from "./ui";
 import { exportInvoices } from "@/lib/export";
+import { InvoiceDocument } from "./invoice-document";
 import { useTask } from "@/lib/use-task";
 
 export function Invoices() {
@@ -392,33 +393,7 @@ export function Invoices() {
           locked={!!tour}
         >
           <div className="invoice-detail-grid">
-            <div className="invoice-paper">
-              <div className="document-watermark">BẢN MINH HỌA</div>
-              <span className="document-brand">visualize tax.</span>
-              <h3>HÓA ĐƠN GIÁ TRỊ GIA TĂNG</h3>
-              <p>
-                Ngày {dateLabel(selected.date)} · Số {selected.number}
-              </p>
-              <div className="document-rule" />
-              <small>Khách hàng / Đối tác</small>
-              <strong>{selected.name}</strong>
-              <p>Mã số thuế: 0000000000 (mẫu)</p>
-              <div className="invoice-line">
-                <span>{selected.category}</span>
-                <strong>{money(selected.amount)}</strong>
-              </div>
-              <div className="invoice-line">
-                <span>VAT minh họa</span>
-                <span>{money(selected.vat)}</span>
-              </div>
-              <div className="invoice-total">
-                <span>Tổng thanh toán</span>
-                <strong>{money(selected.amount + selected.vat)}</strong>
-              </div>
-              <span className="document-footnote">
-                Chứng từ hư cấu · Không có giá trị pháp lý
-              </span>
-            </div>
+            <InvoiceDocument invoice={selected} />
             <div className="invoice-review">
               <span className="review-badge">
                 <Sparkles size={14} />

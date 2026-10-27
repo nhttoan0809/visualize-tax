@@ -1,13 +1,13 @@
 # Kết quả kiểm tra
 
-Kiểm tra ngày 26/10/2026 (Asia/Ho_Chi_Minh).
+Kiểm tra ngày 27/10/2026 (Asia/Ho_Chi_Minh).
 
 | Kiểm tra                    | Kết quả                                                                                                                                                                                                                  |
 | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `pnpm lint`                 | Qua, không có lỗi/cảnh báo mã nguồn                                                                                                                                                                                      |
 | `pnpm typecheck`            | Qua                                                                                                                                                                                                                      |
 | `pnpm format:check`         | Qua                                                                                                                                                                                                                      |
-| `pnpm test:e2e`             | **24/24 qua**, desktop 1440 px và mobile 375 px; kiểm thử chiều cao bổ sung ở 768 và 1024 px                                                                                                                             |
+| `pnpm test:e2e`             | **26/26 qua**, desktop 1440 px và mobile 375 px; kiểm thử chiều cao bổ sung ở 768 và 1024 px                                                                                                                             |
 | `pnpm build`                | Qua; toàn bộ 5 màn hình ứng dụng prerender static                                                                                                                                                                        |
 | Production qua `pnpm start` | Cả 5 route trả HTTP 200; không có lỗi JavaScript trên trình duyệt                                                                                                                                                        |
 | Responsive                  | Không tràn ngang toàn trang ở 375, 768 và 1440 px; bảng cuộn trong container                                                                                                                                             |
@@ -20,6 +20,14 @@ Các kiểm thử mới xác nhận đủ bốn tình huống ngay trong Trợ l
 
 Các kiểm thử bao gồm luồng liên thông, localStorage qua reload, reset sau thay đổi, hủy trích xuất, trình diễn hoàn tất/dừng/Escape, storage không hợp lệ/bị chặn, validate file, không upload file, tìm nhanh và focus bàn phím, menu mobile, sticky banner và kiểm tra tràn ngang.
 
-Ảnh màn hình: [Tổng quan](preview-desktop.png), [Trợ lý thuế](assistant-desktop.png), [Phản hồi kèm biểu đồ](assistant-results.png).
+Ảnh màn hình: [Đối soát hai nguồn](reconciliation-desktop.png), [Tổng quan](preview-desktop.png), [Trợ lý thuế](assistant-desktop.png), [Phản hồi kèm biểu đồ](assistant-results.png).
 
 GitHub/Vercel chưa được kiểm tra deployment thật vì công cụ MCP tương ứng chưa được cung cấp cho phiên làm việc; xem [DEPLOYMENT.md](DEPLOYMENT.md).
+
+## Chi tiết chứng từ và đối soát trực quan — 27/10/2026
+
+- Hóa đơn có danh tính hai bên, số/ký hiệu, từng dòng hàng, thuế, thanh toán và lịch sử. Mở được từ thẻ trích xuất trong hội thoại, kho hóa đơn và tờ khai nguồn.
+- 01/GTGT có nhóm chỉ tiêu đầu vào/đầu ra/khấu trừ và nguồn số liệu; 02/CNKD dùng cấu trúc tham khảo 02/CNKD-TMĐT, tách GTGT/TNCN. Xem [nguồn và giả định](FORM-REFERENCES.md).
+- Trình diễn mở chi tiết hóa đơn trước khi lưu, mở cả hai bản nháp và mở một hóa đơn nguồn trong 01/GTGT. Kiểm thử ghi nhận chính các click này.
+- Đối soát có chọn giao dịch, giấy báo Có mô phỏng, bản ghi chuẩn hóa, chứng từ dựng lại, tab dữ liệu trích xuất, tổng tiền/chênh lệch và lý do ghép. Kiểm tra đủ trường hợp đã khớp, chưa duyệt và thiếu chứng từ.
+- Bảng trong tài liệu cuộn ngang trong vùng có nhãn và truy cập bàn phím; axe kiểm tra cả dialog chứng từ, tờ khai và màn đối soát trên desktop/mobile.

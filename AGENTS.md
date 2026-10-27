@@ -18,6 +18,8 @@ Xây dựng một phiên bản tái hiện **độc lập** của các luồng t
 - `src/app/`: routes, metadata, layout, style toàn cục.
 - `src/components/`: các màn hình tương tác, shell, provider và UI dùng chung.
 - `src/lib/demo-data.ts`: seed, kiểu dữ liệu, artifact hội thoại, mock API, validate dữ liệu lưu.
+- `src/lib/document-data.ts`: chi tiết dòng hàng, danh tính hư cấu, chứng từ mua vào và nguồn tham khảo. Đọc `docs/FORM-REFERENCES.md` trước khi sửa phép tính/biểu mẫu.
+- Tờ khai mới lưu snapshot hóa đơn nguồn. 02/CNKD là tên ngắn của kịch bản tham khảo 02/CNKD-TMĐT; không đồng nhất với quyết toán TNCN hoặc tuyên bố mẫu hiện hành.
 - `src/lib/presentation.ts`: driver con trỏ, click, nhập ký tự và phím tắt, có hỗ trợ abort.
 - `src/app/assistant.css`: layout toàn chiều cao, thẻ kết quả hội thoại và trình diễn; đọc `design-system/visualize-tax/pages/assistant.md` trước khi chỉnh.
 - `src/components/demo-provider.tsx`: trạng thái chung, localStorage, reset, trình diễn tự động.

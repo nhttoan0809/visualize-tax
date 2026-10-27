@@ -36,7 +36,7 @@ Banner cố định ở mọi trang gồm:
 
 - **Đặt lại:** khôi phục seed, xóa hội thoại/bản nháp, hủy thao tác đang xử lý và đưa về tổng quan. Không xóa dữ liệu của ứng dụng khác.
 - **Mô tả tính năng:** trình bày bài toán quản lý hóa đơn, đối chiếu dòng tiền, phân tích và hỗ trợ kê khai; phân biệt định hướng nghiệp vụ với các tích hợp đang được mô phỏng.
-- **Chạy trình diễn:** bắt đầu từ seed và chạy bốn tình huống trong Trợ lý thuế: đính kèm ảnh → trích xuất và lưu hóa đơn; hỏi doanh thu kèm biểu đồ; tạo 01/GTGT; tạo 02/CNKD. Con trỏ minh họa di chuyển giữa các điều khiển, click, gõ từng ký tự và gửi bằng `Ctrl + Enter`. Thao tác gọi chính các handler của giao diện; đây là mô phỏng trong trang web, không điều khiển chuột hệ điều hành. Vùng ứng dụng tạm khóa tương tác; nút dừng và phím Escape luôn hoạt động. Dữ liệu đã hoàn tất được giữ lại khi dừng.
+- **Chạy trình diễn:** bắt đầu từ seed và chạy bốn tình huống trong Trợ lý thuế: đính kèm ảnh → trích xuất → mở chi tiết từng mặt hàng → lưu hóa đơn; hỏi doanh thu kèm biểu đồ; tạo và mở 01/GTGT, kiểm tra hóa đơn nguồn; tạo và mở 02/CNKD (tham khảo 02/CNKD-TMĐT). Con trỏ minh họa di chuyển giữa các điều khiển, click, gõ từng ký tự và gửi bằng `Ctrl + Enter`. Thao tác gọi chính các handler của giao diện; đây là mô phỏng trong trang web, không điều khiển chuột hệ điều hành. Vùng ứng dụng tạm khóa tương tác; nút dừng và phím Escape luôn hoạt động. Dữ liệu đã hoàn tất được giữ lại khi dừng.
 
 Tìm nhanh bằng nút trên thanh đầu trang hoặc `⌘ K` / `Ctrl K`. Menu mobile hỗ trợ bàn phím và Escape. Các animation tôn trọng `prefers-reduced-motion`. Trong Trợ lý, `Alt + I` mở đính kèm; `Enter` hoặc `Ctrl + Enter` gửi tin, `Shift + Enter` xuống dòng.
 
@@ -51,7 +51,7 @@ Tìm nhanh bằng nút trên thanh đầu trang hoặc `⌘ K` / `Ctrl K`. Menu 
 - Trạng thái được lưu với schema version tại key `visualize-tax:demo:v1`. Dữ liệu hỏng hoặc storage bị chặn sẽ dùng seed/in-memory.
 - File người dùng chọn **chỉ cung cấp tên chứng từ**. Nội dung không được đọc hoặc gửi đi. Mọi lần trích xuất đều trả hóa đơn mẫu “Xưởng Giấy Nhỏ”; nhập lại sẽ thay bản mẫu này.
 - Tổng quan lấy chỉ số từ trạng thái thực của demo. Biểu đồ dòng tiền ở Tổng quan là dữ liệu xu hướng riêng; biểu đồ trong Trợ lý được tính trực tiếp từ hóa đơn đã duyệt tại thời điểm trả lời và lưu cùng hội thoại.
-- Thuế minh họa = doanh thu hóa đơn đã duyệt × tỷ lệ mô phỏng. Ở trang Tờ khai, người xem chọn tỷ lệ; kịch bản hội thoại dùng 10% cho 01/GTGT và 1,5% cho CNKD để minh họa phép tính, không xác định mức thuế áp dụng. Không thực hiện khấu trừ, tra cứu pháp luật hoặc tính nghĩa vụ thuế thực tế. Các kỳ tờ khai dùng cùng bộ hóa đơn mẫu.
+- 01/GTGT mô phỏng thuế đầu ra trừ 2.800.000 đồng thuế đầu vào từ hai chứng từ mua vào giả lập. CNKD mô phỏng phân bổ tổng tỷ lệ thành GTGT và TNCN. Kịch bản hội thoại dùng 10% và 1,5%; không xác định mức thuế áp dụng thực tế. Các kỳ tờ khai dùng cùng bộ hóa đơn mẫu. Xem [nguồn biểu mẫu, giả định và phép tính](docs/FORM-REFERENCES.md).
 - Nút **In / Lưu PDF** mở hộp thoại in của trình duyệt; mẫu in luôn có thông báo không có giá trị pháp lý.
 - Không có đăng ký/đăng nhập, OTP, database, thanh toán, tích hợp ngân hàng hay model AI thật.
 
@@ -99,3 +99,5 @@ Biến này chỉ cấu hình URL kiểm thử và không yêu cầu một serve
 ## GitHub và Vercel
 
 Cấu hình Vercel đã sẵn sàng trong `vercel.json`, không cần secret. **Chưa push hoặc deploy** vì phiên làm việc chưa cung cấp công cụ MCP GitHub/Vercel. Xem [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) để tiếp tục đúng yêu cầu triển khai qua MCP khi hai server đã kết nối.
+
+Màn Đối soát có phần kiểm tra hai nguồn: giấy báo Có/bản ghi ngân hàng mô phỏng và chứng từ hóa đơn dựng lại. Chuyển sang Dữ liệu trích xuất để đối chiếu từng trường; chọn giao dịch để xem lý do đã khớp, chờ duyệt hoặc thiếu chứng từ.

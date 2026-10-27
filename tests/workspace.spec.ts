@@ -50,12 +50,14 @@ test("connected invoice, reconciliation, declaration and assistant flow persists
   await page.getByLabel("Thuế suất minh họa (%)").fill("5");
   await page.locator('[data-tour="generate"]').click();
   await expect(
-    page.getByRole("dialog").getByText("98.500.000 ₫", { exact: true }),
+    page.getByRole("dialog").getByText("98.500.000 ₫", { exact: true }).first(),
   ).toBeVisible();
   await expect(
-    page.getByRole("dialog").getByText("4.925.000 ₫", { exact: true }),
+    page.getByRole("dialog").getByText("2.125.000 ₫", { exact: true }).first(),
   ).toBeVisible();
-  await expect(page.getByText(/Không có giá trị pháp lý/)).toBeVisible();
+  await expect(
+    page.locator(".document-disclaimer").getByText(/Không có giá trị pháp lý/),
+  ).toBeVisible();
   await page.getByRole("button", { name: "Đóng hộp thoại" }).click();
   await ready(page, "/assistant");
   await page
@@ -217,6 +219,10 @@ test("complete automated presentation unlocks and carries data across every step
   expect(record.moves).toBeGreaterThan(8);
   expect(record.clicks).toContain("chat-use-sample");
   expect(record.clicks).toContain("chat-save-invoice");
+  expect(record.clicks).toContain("chat-view-invoice");
+  expect(record.clicks).toContain("chat-preview-01-GTGT");
+  expect(record.clicks).toContain("chat-preview-02-CNKD");
+  expect(record.clicks).toContain("declaration-source");
   await expect(page.locator(".demo-pointer")).toHaveCount(0);
 });
 

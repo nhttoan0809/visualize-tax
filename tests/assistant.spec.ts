@@ -20,6 +20,19 @@ test("assistant handles invoice image, chart and both declaration forms in one c
   await expect(
     page.getByRole("region", { name: "Thông tin hóa đơn trích xuất" }),
   ).toContainText("Xưởng Giấy Nhỏ");
+  await page.locator('[data-tour="chat-view-invoice"]').click();
+  const invoiceDialog = page.getByRole("dialog");
+  await expect(invoiceDialog).toContainText("500");
+  await expect(invoiceDialog).toContainText("28.000");
+  await expect(invoiceDialog).toContainText("Sổ tay A5");
+  await expect(invoiceDialog).toContainText("DEMO-0318264097");
+  await expect(invoiceDialog).toContainText("22.000.000");
+  const invoiceAxe = await new AxeBuilder({ page })
+    .include('[role="dialog"]')
+    .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+    .analyze();
+  expect(invoiceAxe.violations).toEqual([]);
+  await page.getByRole("button", { name: "Đóng hộp thoại" }).click();
   await page.getByRole("button", { name: "Lưu hóa đơn", exact: true }).click();
   await expect(
     page.getByRole("button", { name: "Đã lưu hóa đơn", exact: true }),
@@ -44,6 +57,23 @@ test("assistant handles invoice image, chart and both declaration forms in one c
     await expect(page.getByRole("dialog")).toContainText(
       "Không có giá trị pháp lý",
     );
+    await expect(page.getByRole("dialog")).toContainText(
+      form === "01/GTGT" ? "7.050.000" : "1.477.500",
+    );
+    if (form === "01/GTGT") {
+      await expect(page.getByRole("dialog")).toContainText("2.800.000");
+      await page.locator('[data-tour="declaration-source"]').first().click();
+      await expect(page.getByRole("dialog")).toContainText("Sổ tay A5");
+    } else {
+      await expect(page.getByRole("dialog")).toContainText("02/CNKD-TMĐT");
+      await expect(page.getByRole("dialog")).toContainText("985.000");
+      await expect(page.getByRole("dialog")).toContainText("492.500");
+    }
+    const formAxe = await new AxeBuilder({ page })
+      .include('[role="dialog"]')
+      .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+      .analyze();
+    expect(formAxe.violations).toEqual([]);
     await page.getByRole("button", { name: "Đóng hộp thoại" }).click();
   }
   await page.reload();
