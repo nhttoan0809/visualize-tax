@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import {
   ArrowDownLeft,
@@ -16,27 +16,20 @@ import {
   money,
   type Invoice,
 } from "@/lib/demo-data";
-import { bankDetails } from "@/lib/document-data";
+import { business, bankDetails, invoiceDetails } from "@/lib/document-data";
 import { InvoiceDocument } from "./invoice-document";
-import { Modal } from "./ui";
 
 export function ReconciliationInspector({
   transaction: b,
   invoice,
   matched,
-  onSelect,
-  transactions,
 }: {
   transaction: (typeof bankTransactions)[number];
   invoice?: Invoice;
   matched: boolean;
-  onSelect: (id: string) => void;
-  transactions: typeof bankTransactions;
 }) {
   const bank = bankDetails(b);
-  const [view, setView] = useState<"scan" | "data">("scan");
-  const [detail, setDetail] = useState(false);
-  const closeDetail = useCallback(() => setDetail(false), [setDetail]);
+  const [view, setView] = useState<"scan" | "data">("data");
   const equal = !!invoice && invoice.amount + invoice.vat === b.amount;
   const approved = invoice?.status === "approved";
   const reason = !invoice
@@ -47,41 +40,38 @@ export function ReconciliationInspector({
         ? "Số tiền trùng khớp nhưng hóa đơn chưa duyệt. Kiểm tra chứng từ trước khi chạy đối soát."
         : matched
           ? "Đã ghép: hóa đơn đã duyệt và tổng thanh toán trùng số tiền ghi Có."
-          : "Đủ điều kiện ghép trong bộ dữ liệu mẫu. Chạy đối soát để ghi nhận kết quả.";
+          : "Đủ điều kiện ghép trong bộ dữ liệu mẫu. Đồng bộ lại để cập nhật kết quả.";
   return (
     <section
-      className="panel reconciliation-inspector"
+      className="reconciliation-inspector"
       aria-label="Đối chiếu chứng từ và giao dịch"
       id="reconciliation-inspector"
     >
-      <div className="panel-heading">
-        <div>
-          <span className="page-eyebrow">
-            Hai nguồn dữ liệu · Một phép đối chiếu
-          </span>
-          <h2>Tiền về từ đâu, khớp với hóa đơn nào?</h2>
-          <p>
-            Chọn một giao dịch trong danh sách bên dưới để xem cả hai chứng từ.
-          </p>
-        </div>
-        <span className={`status ${matched ? "status-green" : "status-amber"}`}>
-          {matched ? "Đã khớp" : "Cần kiểm tra"}
-        </span>
-      </div>
-      <label className="comparison-picker">
-        Giao dịch đang xem
-        <select value={b.id} onChange={(e) => onSelect(e.target.value)}>
-          {transactions.map((t) => (
-            <option key={t.id} value={t.id}>
-              {t.date} · {t.text} · {money(t.amount)}
-            </option>
-          ))}
-        </select>
-      </label>
-      <div className="comparison-verdict">
+      <div className="comparison-verdict" data-tour="reconcile-verdict">
         <div className={matched ? "comparison-success" : "comparison-pending"}>
           {matched ? <Check size={18} /> : <CircleAlert size={18} />}
           <strong>{reason}</strong>
+        </div>
+        <div className="comparison-identities">
+          <div>
+            <span>MST bên chuyển · hồ sơ đối tác</span>
+            <strong>{bank.payerTaxId}</strong>
+          </div>
+          <div>
+            <span>MST bên mua · hóa đơn</span>
+            <strong>
+              {invoice ? invoiceDetails(invoice).taxId : "Chưa có"}
+            </strong>
+          </div>
+          <div>
+            <span>MST bên nhận / bên bán</span>
+            <strong>{bank.payeeTaxId}</strong>
+            <small>
+              {bank.payeeTaxId === business.taxId
+                ? "Trùng MST bên bán trên hóa đơn"
+                : "Khác MST bên bán"}
+            </small>
+          </div>
         </div>
         <div className="comparison-checks">
           <div>
@@ -107,10 +97,10 @@ export function ReconciliationInspector({
           </div>
         </div>
         <p>
-          Quy tắc demo: ánh xạ giao dịch với hóa đơn có sẵn trong bộ mẫu → kiểm
-          tra tổng tiền → kiểm tra đã duyệt. Nội dung chuyển khoản và ngày được
-          hiển thị để người dùng xem xét; demo chưa tự phân tích nội dung, ghép
-          nhiều hóa đơn hay thanh toán từng phần.
+          Quy tắc demo: so sánh số hóa đơn và MST trong hồ sơ mẫu → kiểm tra
+          tổng tiền → kiểm tra đã duyệt. Nội dung chuyển khoản và ngày được hiển
+          thị để người dùng xem xét; demo chưa tự phân tích nội dung, ghép nhiều
+          hóa đơn hay thanh toán từng phần.
         </p>
       </div>
       <div className="comparison-sources">
@@ -142,6 +132,7 @@ export function ReconciliationInspector({
                 <dd>
                   {bank.account}
                   <small>{bank.accountName}</small>
+                  <small>MST {bank.payeeTaxId}</small>
                 </dd>
               </div>
               <div>
@@ -149,6 +140,7 @@ export function ReconciliationInspector({
                 <dd>
                   {bank.sender}
                   <small>{bank.senderAccount}</small>
+                  <small>MST {bank.payerTaxId} · từ hồ sơ đối tác mẫu</small>
                 </dd>
               </div>
               <div>
@@ -181,6 +173,9 @@ export function ReconciliationInspector({
                   amount: b.amount,
                   currency: bank.currency,
                   counterparty: bank.sender,
+                  counterpartyTaxId: bank.payerTaxId,
+                  beneficiaryTaxId: bank.payeeTaxId,
+                  invoiceNumber: b.invoiceNumber,
                   description: b.text,
                 },
                 null,
@@ -194,11 +189,6 @@ export function ReconciliationInspector({
             <span>
               <FileScan size={17} /> Hóa đơn nhập / scan
             </span>
-            {invoice && (
-              <button className="text-button" onClick={() => setDetail(true)}>
-                Mở đầy đủ <ArrowUpRight size={13} />
-              </button>
-            )}
           </header>
           {invoice ? (
             <>
@@ -218,6 +208,7 @@ export function ReconciliationInspector({
                 <button
                   aria-pressed={view === "data"}
                   className={view === "data" ? "selected" : ""}
+                  data-tour="reconcile-extracted"
                   onClick={() => setView("data")}
                 >
                   <ScanText size={14} />
@@ -239,9 +230,17 @@ export function ReconciliationInspector({
               ) : (
                 <div className="extracted-comparison">
                   <span className="artifact-badge">
-                    Kết quả OCR mô phỏng · Chờ người dùng kiểm tra
+                    Kết quả OCR mô phỏng · Dữ liệu từ chứng từ
                   </span>
                   <dl className="receipt-fields">
+                    <div>
+                      <dt>MST bên mua</dt>
+                      <dd>{invoiceDetails(invoice).taxId}</dd>
+                    </div>
+                    <div>
+                      <dt>MST bên bán</dt>
+                      <dd>{business.taxId}</dd>
+                    </div>
                     <div>
                       <dt>Tệp nguồn</dt>
                       <dd>{invoice.source}</dd>
@@ -307,20 +306,13 @@ export function ReconciliationInspector({
           là kịch bản có sẵn.
         </p>
       </div>
-      {detail && invoice && (
-        <Modal
-          title={`Hóa đơn #${invoice.number}`}
-          subtitle="Chứng từ dùng để đối chiếu giao dịch ngân hàng"
-          onClose={closeDetail}
-          wide
-        >
+      {invoice && (
+        <details className="reconcile-full-invoice">
+          <summary data-tour="reconcile-full-invoice">
+            Xem đầy đủ hóa đơn #{invoice.number}
+          </summary>
           <InvoiceDocument invoice={invoice} />
-          <div className="modal-actions">
-            <button className="button secondary" onClick={closeDetail}>
-              Đóng chi tiết
-            </button>
-          </div>
-        </Modal>
+        </details>
       )}
     </section>
   );

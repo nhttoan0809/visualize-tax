@@ -31,7 +31,7 @@ test("connected invoice, reconciliation, declaration and assistant flow persists
   ).toBeVisible();
   await ready(page, "/reconciliation");
   await page
-    .getByRole("button", { name: "Chạy đối soát", exact: true })
+    .getByRole("button", { name: "Đồng bộ & đối soát", exact: true })
     .click();
   await expect(
     page
@@ -42,7 +42,7 @@ test("connected invoice, reconciliation, declaration and assistant flow persists
   await expect(
     page
       .getByRole("row")
-      .filter({ hasText: "Giao dich chua co hoa don" })
+      .filter({ hasText: "KHONG GIAN LA HD 124" })
       .getByText("Chưa khớp", { exact: true }),
   ).toBeVisible();
   await ready(page, "/declarations");
@@ -77,7 +77,8 @@ test("connected invoice, reconciliation, declaration and assistant flow persists
   expect(resetState.invoices).toHaveLength(6);
   expect(resetState.messages).toHaveLength(0);
   expect(resetState.declarations).toHaveLength(0);
-  expect(resetState.matchedIds).toHaveLength(3);
+  expect(resetState.matchedIds).toHaveLength(0);
+  expect(resetState.bankSync).toBeUndefined();
 });
 
 test("quick search supports keyboard focus and mobile navigation has an Escape exit", async ({
@@ -189,15 +190,19 @@ test("complete automated presentation unlocks and carries data across every step
   ).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Chạy trình diễn", exact: true }),
-  ).toBeVisible({ timeout: 70000 });
+  ).toBeVisible({ timeout: 85000 });
   await expect(page.locator(".application")).not.toHaveAttribute("inert", "");
-  await expect(page.getByRole("log")).toContainText("98.500.000");
+  await expect(page).toHaveURL(/reconciliation/);
   const state = await page.evaluate(() =>
     JSON.parse(localStorage.getItem("visualize-tax:demo:v1")!),
   );
   expect(state.invoices).toHaveLength(7);
   expect(state.declarations).toHaveLength(2);
-  expect(state.matchedIds).toHaveLength(3);
+  expect(state.matchedIds).toHaveLength(5);
+  expect(state.bankSync.transactions).toHaveLength(7);
+  expect(
+    state.messages.some((m: { text: string }) => m.text.includes("98.500.000")),
+  ).toBe(true);
   expect(
     state.declarations.map((d: { form: string }) => d.form).sort(),
   ).toEqual(["01/GTGT", "02/CNKD"]);
@@ -223,6 +228,10 @@ test("complete automated presentation unlocks and carries data across every step
   expect(record.clicks).toContain("chat-preview-01-GTGT");
   expect(record.clicks).toContain("chat-preview-02-CNKD");
   expect(record.clicks).toContain("declaration-source");
+  expect(record.clicks).toContain("reconcile");
+  expect(record.clicks).toContain("reconcile-bank-demo");
+  expect(record.clicks).toContain("reconcile-bank-02");
+  expect(record.clicks).toContain("reconcile-full-invoice");
   await expect(page.locator(".demo-pointer")).toHaveCount(0);
 });
 

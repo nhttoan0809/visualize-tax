@@ -442,12 +442,12 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
             aria-label="Trình diễn tự động"
           >
             <div className="tour-progress-track">
-              <span style={{ width: `${(tour.step / 4) * 100}%` }} />
+              <span style={{ width: `${(tour.step / 5) * 100}%` }} />
             </div>
             <div className="tour-controller-content">
               <span className="tour-step">
                 {tour.step}
-                <small>/ 4</small>
+                <small>/ 5</small>
               </span>
               <div aria-live="polite" aria-atomic="true">
                 <span className="tour-label">Đang trình diễn tự động</span>

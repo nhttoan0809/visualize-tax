@@ -7,7 +7,7 @@ Kiểm tra ngày 27/10/2026 (Asia/Ho_Chi_Minh).
 | `pnpm lint`                 | Qua, không có lỗi/cảnh báo mã nguồn                                                                                                                                                                                      |
 | `pnpm typecheck`            | Qua                                                                                                                                                                                                                      |
 | `pnpm format:check`         | Qua                                                                                                                                                                                                                      |
-| `pnpm test:e2e`             | **26/26 qua**, desktop 1440 px và mobile 375 px; kiểm thử chiều cao bổ sung ở 768 và 1024 px                                                                                                                             |
+| `pnpm test:e2e`             | **30/30 qua**, desktop 1440 px và mobile 375 px; kiểm thử chiều cao bổ sung ở 768 và 1024 px                                                                                                                             |
 | `pnpm build`                | Qua; toàn bộ 5 màn hình ứng dụng prerender static                                                                                                                                                                        |
 | Production qua `pnpm start` | Cả 5 route trả HTTP 200; không có lỗi JavaScript trên trình duyệt                                                                                                                                                        |
 | Responsive                  | Không tràn ngang toàn trang ở 375, 768 và 1440 px; bảng cuộn trong container                                                                                                                                             |
@@ -20,7 +20,7 @@ Các kiểm thử mới xác nhận đủ bốn tình huống ngay trong Trợ l
 
 Các kiểm thử bao gồm luồng liên thông, localStorage qua reload, reset sau thay đổi, hủy trích xuất, trình diễn hoàn tất/dừng/Escape, storage không hợp lệ/bị chặn, validate file, không upload file, tìm nhanh và focus bàn phím, menu mobile, sticky banner và kiểm tra tràn ngang.
 
-Ảnh màn hình: [Đối soát hai nguồn](reconciliation-desktop.png), [Tổng quan](preview-desktop.png), [Trợ lý thuế](assistant-desktop.png), [Phản hồi kèm biểu đồ](assistant-results.png).
+Ảnh màn hình: [Đối soát ban đầu](reconciliation-empty.png), [Bảng kết quả đối soát](reconciliation-desktop.png), [Popup chi tiết](reconciliation-detail.png), [Tổng quan](preview-desktop.png), [Trợ lý thuế](assistant-desktop.png), [Phản hồi kèm biểu đồ](assistant-results.png).
 
 GitHub/Vercel chưa được kiểm tra deployment thật vì công cụ MCP tương ứng chưa được cung cấp cho phiên làm việc; xem [DEPLOYMENT.md](DEPLOYMENT.md).
 
@@ -29,5 +29,13 @@ GitHub/Vercel chưa được kiểm tra deployment thật vì công cụ MCP tư
 - Hóa đơn có danh tính hai bên, số/ký hiệu, từng dòng hàng, thuế, thanh toán và lịch sử. Mở được từ thẻ trích xuất trong hội thoại, kho hóa đơn và tờ khai nguồn.
 - 01/GTGT có nhóm chỉ tiêu đầu vào/đầu ra/khấu trừ và nguồn số liệu; 02/CNKD dùng cấu trúc tham khảo 02/CNKD-TMĐT, tách GTGT/TNCN. Xem [nguồn và giả định](FORM-REFERENCES.md).
 - Trình diễn mở chi tiết hóa đơn trước khi lưu, mở cả hai bản nháp và mở một hóa đơn nguồn trong 01/GTGT. Kiểm thử ghi nhận chính các click này.
-- Đối soát có chọn giao dịch, giấy báo Có mô phỏng, bản ghi chuẩn hóa, chứng từ dựng lại, tab dữ liệu trích xuất, tổng tiền/chênh lệch và lý do ghép. Kiểm tra đủ trường hợp đã khớp, chưa duyệt và thiếu chứng từ.
+- Đối soát có chọn giao dịch, giấy báo Có mô phỏng, bản ghi chuẩn hóa, chứng từ dựng lại, tab dữ liệu trích xuất, tổng tiền/chênh lệch và lý do ghép. Kiểm tra trường hợp đã khớp và lệch tiền; bản thiết kế mới chuyển phần này vào popup sau khi đồng bộ.
 - Bảng trong tài liệu cuộn ngang trong vùng có nhãn và truy cập bàn phím; axe kiểm tra cả dialog chứng từ, tờ khai và màn đối soát trên desktop/mobile.
+
+## Thiết kế lại luồng đồng bộ và đối soát
+
+- Khởi tạo và reset: không có giao dịch hay kết quả đối soát. Hủy đồng bộ đang chờ không ghi kết quả trễ.
+- Đồng bộ thay thế snapshot, lưu thời gian đồng bộ và giữ kết quả qua reload; lần hai không nhân đôi dòng. Workspace cũ giữ hóa đơn nhưng không tự tạo kết quả ngân hàng.
+- Bảng kết quả ở đầu trang; click dòng mở dialog rộng có MST hai bên, tiền ghi Có, tổng hóa đơn, chênh lệch, bản ghi ngân hàng và chứng từ hóa đơn. Chênh lệch tính theo ngân hàng trừ tổng hóa đơn.
+- Sáu giao dịch seed sau đồng bộ: bốn khớp, hai lệch (-350.000 và -4.500.000 đồng). Trình diễn thêm hóa đơn mới rồi đồng bộ thành bảy giao dịch, năm khớp và hai lệch.
+- Trình diễn có năm bước; case cuối mở cặp 22 triệu khớp và cặp An Nhiên lệch tiền, ghi nhận click sync, popup và mở nguồn.

@@ -1,4 +1,4 @@
-import { purchaseLedger } from "./document-data";
+import { business, invoiceDetails, purchaseLedger } from "./document-data";
 
 export type InvoiceStatus = "review" | "approved";
 export interface Invoice {
@@ -44,10 +44,26 @@ export interface Message {
   attachment?: ChatAttachment;
   artifact?: MessageArtifact;
 }
+export interface BankTransaction {
+  id: string;
+  invoiceId: string;
+  invoiceNumber: string;
+  payerName: string;
+  payerTaxId: string;
+  payeeTaxId: string;
+  text: string;
+  amount: number;
+  date: string;
+}
+export interface BankSync {
+  transactions: BankTransaction[];
+  syncedAt: string;
+}
 export interface DemoState {
   version: 1;
   invoices: Invoice[];
   matchedIds: string[];
+  bankSync?: BankSync;
   declarations: Declaration[];
   messages: Message[];
 }
@@ -120,7 +136,7 @@ export const seedInvoices: Invoice[] = [
     source: "hoa-don-cafe.pdf",
   },
 ];
-export const bankTransactions = [
+const bankFixtures = [
   {
     id: "bank-01",
     invoiceId: "inv-01",
@@ -132,7 +148,7 @@ export const bankTransactions = [
     id: "bank-02",
     invoiceId: "inv-02",
     text: "AN NHIEN HD 127",
-    amount: 20350000,
+    amount: 20000000,
     date: "22/10/2026",
   },
   {
@@ -158,10 +174,10 @@ export const bankTransactions = [
   },
   {
     id: "bank-06",
-    invoiceId: "",
-    text: "Giao dich chua co hoa don",
-    amount: 8500000,
-    date: "10/10/2026",
+    invoiceId: "inv-05",
+    text: "KHONG GIAN LA HD 124",
+    amount: 45000000,
+    date: "15/10/2026",
   },
   {
     id: "bank-demo",
@@ -171,11 +187,36 @@ export const bankTransactions = [
     date: "25/10/2026",
   },
 ];
+export const bankTransactions: BankTransaction[] = bankFixtures.map((b) => {
+  const invoice = seedInvoices.find((i) => i.id === b.invoiceId) ?? {
+    ...seedInvoices[0],
+    id: "inv-demo",
+    name: "Xưởng Giấy Nhỏ",
+    number: "0000129",
+  };
+  return {
+    ...b,
+    invoiceNumber: invoice.number,
+    payerName: invoice.name,
+    payerTaxId: invoiceDetails(invoice).taxId,
+    payeeTaxId: business.taxId,
+  };
+});
+export function matchesBankInvoice(b: BankTransaction, i: Invoice): boolean {
+  return (
+    b.invoiceId === i.id &&
+    b.invoiceNumber === i.number &&
+    b.payerTaxId === invoiceDetails(i).taxId &&
+    b.payeeTaxId === business.taxId &&
+    b.amount === i.amount + i.vat &&
+    i.status === "approved"
+  );
+}
 export function initialState(): DemoState {
   return {
     version: 1,
     invoices: structuredClone(seedInvoices),
-    matchedIds: ["inv-03", "inv-04", "inv-06"],
+    matchedIds: [],
     declarations: [],
     messages: [],
   };
@@ -233,20 +274,24 @@ export const mockApi = {
       source,
     };
   },
-  async reconcile(
+  async syncAndReconcile(
     invoices: Invoice[],
     signal?: AbortSignal,
-  ): Promise<string[]> {
-    await delay(1400, signal);
-    return invoices
-      .filter(
-        (i) =>
-          i.status === "approved" &&
-          bankTransactions.some(
-            (b) => b.invoiceId === i.id && b.amount === i.amount + i.vat,
-          ),
-      )
-      .map((i) => i.id);
+  ): Promise<BankSync & { matchedIds: string[] }> {
+    await delay(1800, signal);
+    const transactions = structuredClone(
+      bankTransactions.filter(
+        (b) =>
+          b.id !== "bank-demo" || invoices.some((i) => i.id === "inv-demo"),
+      ),
+    );
+    return {
+      transactions,
+      syncedAt: new Date().toISOString(),
+      matchedIds: invoices
+        .filter((i) => transactions.some((b) => matchesBankInvoice(b, i)))
+        .map((i) => i.id),
+    };
   },
   async createDeclaration(
     input: Pick<Declaration, "form" | "period" | "revenue" | "rate">,
@@ -294,7 +339,7 @@ export const mockApi = {
       return `Kỳ tháng 10/2026 · Sổ doanh thu bán ra\n\nTrong bộ dữ liệu minh họa có ${invoices.length} hóa đơn, ${approved.length} hóa đơn đã duyệt. Tổng doanh thu đã duyệt là ${money(approved.reduce((sum, i) => sum + i.amount, 0))}.\n\nHóa đơn có doanh thu lớn nhất: ${approved.length ? approved.toSorted((a, b) => b.amount - a.amount)[0].name : "Chưa có"}. Tổng thuế GTGT đầu ra ghi trên chứng từ là ${money(approved.reduce((sum, i) => sum + i.vat, 0))}; tổng thanh toán là ${money(approved.reduce((sum, i) => sum + i.amount + i.vat, 0))}.\n\nCòn ${invoices.length - approved.length} hóa đơn chưa duyệt, chưa đưa vào biểu đồ. Dữ liệu phản ánh ngày lập hóa đơn, không phải dòng tiền đã thu. Mở kho Hóa đơn để kiểm tra từng chứng từ hoặc sang Đối soát để so khớp giao dịch.`;
     }
     if (/đối soát|ngân hàng/.test(q))
-      return "Luồng đối soát mẫu gồm 3 bước:\n\n1. Duyệt thông tin hóa đơn.\n2. So khớp tổng thanh toán với giao dịch ngân hàng mẫu.\n3. Kiểm tra các giao dịch chưa khớp.\n\nMở mục Đối soát và chọn ‘Chạy đối soát’ để trải nghiệm. Không có kết nối ngân hàng thực tế.";
+      return "Luồng đối soát mẫu gồm 3 bước:\n\n1. Duyệt thông tin hóa đơn.\n2. So khớp tổng thanh toán với giao dịch ngân hàng mẫu.\n3. Kiểm tra các giao dịch chưa khớp.\n\nMở mục Đối soát và chọn ‘Đồng bộ & đối soát’ để trải nghiệm. Không có kết nối ngân hàng thực tế.";
     if (/tờ khai|thuế|gtgt|tncn/.test(q))
       return "Bạn có thể thử tạo bản nháp 01/GTGT, 01/CNKD hoặc 02/CNKD tại mục Tờ khai. Doanh thu được lấy từ các hóa đơn đã duyệt; thuế suất là tham số minh họa có thể chỉnh sửa.\n\nBản nháp có thể xem trước và in / lưu PDF bằng trình duyệt. Đây là kịch bản có sẵn, không phải tư vấn thuế hay biểu mẫu dùng để nộp hồ sơ.";
     return "Tôi đang chạy kịch bản trả lời minh họa. Bạn có thể hỏi về ‘doanh thu hóa đơn’, ‘đối soát ngân hàng’ hoặc ‘tạo tờ khai’ để khám phá các luồng trong workspace. Không có mô hình AI thực tế được kết nối.";
@@ -323,12 +368,41 @@ export function isDemoState(value: unknown): value is DemoState {
         i.vat >= 0 &&
         ["review", "approved"].includes(i.status),
     ) &&
+    (!s.bankSync ||
+      (typeof s.bankSync.syncedAt === "string" &&
+        Number.isFinite(Date.parse(s.bankSync.syncedAt)) &&
+        Array.isArray(s.bankSync.transactions) &&
+        s.bankSync.transactions.length <= 100 &&
+        new Set(s.bankSync.transactions.map((b) => b.id)).size ===
+          s.bankSync.transactions.length &&
+        s.bankSync.transactions.every(
+          (b) =>
+            b &&
+            [
+              b.id,
+              b.invoiceId,
+              b.invoiceNumber,
+              b.payerName,
+              b.payerTaxId,
+              b.payeeTaxId,
+              b.text,
+              b.date,
+            ].every((v) => typeof v === "string") &&
+            Number.isFinite(b.amount) &&
+            b.amount >= 0,
+        ))) &&
     Array.isArray(s.matchedIds) &&
     s.matchedIds.length <= s.invoices.length &&
     s.matchedIds.every(
       (id) =>
         typeof id === "string" &&
-        s.invoices.some((i) => i.id === id && i.status === "approved"),
+        s.invoices.some(
+          (i) =>
+            i.id === id &&
+            i.status === "approved" &&
+            (!s.bankSync ||
+              s.bankSync.transactions.some((b) => matchesBankInvoice(b, i))),
+        ),
     ) &&
     Array.isArray(s.declarations) &&
     s.declarations.length <= 100 &&

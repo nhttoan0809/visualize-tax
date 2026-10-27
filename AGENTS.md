@@ -30,7 +30,7 @@ Xây dựng một phiên bản tái hiện **độc lập** của các luồng t
 
 1. Tổng quan phản ánh hóa đơn đã duyệt, giao dịch đã khớp và số bản nháp.
 2. Hóa đơn: tìm kiếm, lọc, sắp xếp, thêm chứng từ mẫu, kiểm tra chi tiết và duyệt. Chọn file chỉ dùng tên file; không đọc, gửi đi hoặc OCR thật.
-3. Đối soát: chỉ ghép hóa đơn đã duyệt với giao dịch mẫu có tổng thanh toán trùng khớp; giữ rõ trạng thái chưa khớp.
+3. Đối soát: ban đầu trống; “Đồng bộ & đối soát” tải snapshot giao dịch mẫu và ghép theo số hóa đơn, MST hai bên, tổng thanh toán, trạng thái đã duyệt. Bảng kết quả ở đầu trang; click từng dòng mở popup hai nguồn. Dòng chưa khớp phải có chênh lệch cụ thể trong bộ mẫu. Đọc `design-system/visualize-tax/pages/reconciliation.md` trước khi chỉnh.
 4. Tờ khai: chọn biểu mẫu, kỳ mẫu và thuế suất minh họa; tổng hợp từ doanh thu đã duyệt; xem trước, in/lưu PDF bằng trình duyệt.
 5. Trợ lý: workspace chiếm chiều cao viewport, vùng hội thoại cuộn riêng và composer bám đáy. Hỗ trợ ảnh hóa đơn mẫu → trích xuất → kiểm tra/lưu, hỏi dữ liệu kèm biểu đồ từ hóa đơn đã duyệt, tạo/xem trước 01/GTGT và 02/CNKD ngay trong hội thoại. Phản hồi và công thức là mô phỏng; thông báo rõ không có AI thật.
 
@@ -39,8 +39,8 @@ Xây dựng một phiên bản tái hiện **độc lập** của các luồng t
 - Banner cảnh báo phiên bản tái hiện phải luôn sticky trên cùng ở mọi route; không được cho ẩn vĩnh viễn.
 - Banner chứa **Mô tả tính năng**, **Đặt lại** và **Chạy trình diễn / Dừng trình diễn**.
 - Đặt lại khôi phục toàn bộ seed, hội thoại, đối soát, bản nháp, hộp thoại, bộ lọc và thao tác đang chờ. Chỉ xóa key của ứng dụng, không gọi `localStorage.clear()`.
-- LocalStorage phải có version, validation và fallback khi dữ liệu hỏng hoặc bị chặn. Không lưu nội dung file người dùng.
-- Trình diễn tập trung bốn case trong Trợ lý thuế: ảnh hóa đơn → trích xuất/lưu; câu hỏi kèm biểu đồ; 01/GTGT; 02/CNKD. Có con trỏ minh họa di chuyển, click, gõ từng ký tự và phím tắt. Phải gọi handler giao diện thay vì thay trực tiếp kết quả trạng thái. Trình diễn phải thực hiện các thao tác trong trình duyệt, tạm khóa tương tác ứng dụng bằng `inert` và lớp chặn pointer; luôn giữ nút dừng và phím Escape hoạt động.
+- LocalStorage phải có version, validation và fallback khi dữ liệu hỏng hoặc bị chặn. `bankSync` lưu snapshot và thời gian đồng bộ; workspace cũ chưa có snapshot khôi phục với đối soát trống, giữ nguyên dữ liệu khác. Không lưu nội dung file người dùng.
+- Trình diễn có năm case: bốn case trong Trợ lý thuế (ảnh hóa đơn → trích xuất/lưu; câu hỏi kèm biểu đồ; 01/GTGT; 02/CNKD), sau đó đồng bộ ngân hàng và mở các cặp khớp/lệch tiền tại Đối soát. Có con trỏ minh họa di chuyển, click, gõ từng ký tự và phím tắt. Phải gọi handler giao diện thay vì thay trực tiếp kết quả trạng thái. Trình diễn phải thực hiện các thao tác trong trình duyệt, tạm khóa tương tác ứng dụng bằng `inert` và lớp chặn pointer; luôn giữ nút dừng và phím Escape hoạt động.
 - Mọi timer/request mô phỏng phải được hủy khi reset, dừng trình diễn hoặc unmount. Dừng phải trả quyền tương tác ngay.
 - Tôn trọng `prefers-reduced-motion`; giữ focus nhìn thấy, tên truy cập cho nút icon, keyboard navigation, nhãn form và trạng thái đang xử lý.
 

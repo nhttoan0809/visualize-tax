@@ -36,7 +36,7 @@ Banner cố định ở mọi trang gồm:
 
 - **Đặt lại:** khôi phục seed, xóa hội thoại/bản nháp, hủy thao tác đang xử lý và đưa về tổng quan. Không xóa dữ liệu của ứng dụng khác.
 - **Mô tả tính năng:** trình bày bài toán quản lý hóa đơn, đối chiếu dòng tiền, phân tích và hỗ trợ kê khai; phân biệt định hướng nghiệp vụ với các tích hợp đang được mô phỏng.
-- **Chạy trình diễn:** bắt đầu từ seed và chạy bốn tình huống trong Trợ lý thuế: đính kèm ảnh → trích xuất → mở chi tiết từng mặt hàng → lưu hóa đơn; hỏi doanh thu kèm biểu đồ; tạo và mở 01/GTGT, kiểm tra hóa đơn nguồn; tạo và mở 02/CNKD (tham khảo 02/CNKD-TMĐT). Con trỏ minh họa di chuyển giữa các điều khiển, click, gõ từng ký tự và gửi bằng `Ctrl + Enter`. Thao tác gọi chính các handler của giao diện; đây là mô phỏng trong trang web, không điều khiển chuột hệ điều hành. Vùng ứng dụng tạm khóa tương tác; nút dừng và phím Escape luôn hoạt động. Dữ liệu đã hoàn tất được giữ lại khi dừng.
+- **Chạy trình diễn:** bắt đầu từ seed và chạy năm tình huống: bốn tình huống trong Trợ lý thuế gồm đính kèm ảnh → trích xuất → mở chi tiết từng mặt hàng → lưu hóa đơn; hỏi doanh thu kèm biểu đồ; tạo và mở 01/GTGT, kiểm tra hóa đơn nguồn; tạo và mở 02/CNKD (tham khảo 02/CNKD-TMĐT); tiếp theo đồng bộ ngân hàng và mở popup so sánh một cặp khớp, một cặp lệch tiền. Con trỏ minh họa di chuyển giữa các điều khiển, click, gõ từng ký tự và gửi bằng `Ctrl + Enter`. Thao tác gọi chính các handler của giao diện; đây là mô phỏng trong trang web, không điều khiển chuột hệ điều hành. Vùng ứng dụng tạm khóa tương tác; nút dừng và phím Escape luôn hoạt động. Dữ liệu đã hoàn tất được giữ lại khi dừng.
 
 Tìm nhanh bằng nút trên thanh đầu trang hoặc `⌘ K` / `Ctrl K`. Menu mobile hỗ trợ bàn phím và Escape. Các animation tôn trọng `prefers-reduced-motion`. Trong Trợ lý, `Alt + I` mở đính kèm; `Enter` hoặc `Ctrl + Enter` gửi tin, `Shift + Enter` xuống dòng.
 
@@ -94,10 +94,10 @@ Bộ kiểm thử chạy trên desktop 1440 px và mobile 375 px, bao gồm lu�
 PLAYWRIGHT_BASE_URL=http://localhost:3000 pnpm test:e2e
 ```
 
-Biến này chỉ cấu hình URL kiểm thử và không yêu cầu một server thứ hai. Kiểm thử trình diễn chạy cả chuyển động/gõ ký tự bình thường và xác nhận đủ bốn tình huống.
+Biến này chỉ cấu hình URL kiểm thử và không yêu cầu một server thứ hai. Kiểm thử trình diễn chạy cả chuyển động/gõ ký tự bình thường và xác nhận đủ năm tình huống, gồm đồng bộ ngân hàng và kiểm tra cặp khớp/lệch tiền.
 
 ## GitHub và Vercel
 
 Cấu hình Vercel đã sẵn sàng trong `vercel.json`, không cần secret. **Chưa push hoặc deploy** vì phiên làm việc chưa cung cấp công cụ MCP GitHub/Vercel. Xem [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) để tiếp tục đúng yêu cầu triển khai qua MCP khi hai server đã kết nối.
 
-Màn Đối soát có phần kiểm tra hai nguồn: giấy báo Có/bản ghi ngân hàng mô phỏng và chứng từ hóa đơn dựng lại. Chuyển sang Dữ liệu trích xuất để đối chiếu từng trường; chọn giao dịch để xem lý do đã khớp, chờ duyệt hoặc thiếu chứng từ.
+Màn Đối soát bắt đầu trống. Chọn **Đồng bộ & đối soát** để lưu snapshot giao dịch mẫu; bảng kết quả nằm ở đầu trang, click từng dòng mở popup kiểm tra hai nguồn: giấy báo Có/bản ghi ngân hàng mô phỏng và chứng từ hóa đơn dựng lại. Chuyển sang Dữ liệu trích xuất để đối chiếu từng trường; chọn giao dịch để xem lý do đã khớp hoặc lệch tiền. MST bên mua/bên chuyển và bên bán/bên nhận dùng chung định danh hư cấu; hai dòng lệch lần lượt 350.000 và 4.500.000 đồng. Đồng bộ lại không nhân bản giao dịch, reset xóa snapshot; dữ liệu lưu cũ chưa đồng bộ sẽ hiển thị danh sách trống.

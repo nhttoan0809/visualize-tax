@@ -60,7 +60,11 @@ export function DemoProvider({ children }: { children: ReactNode }) {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
           const parsed: unknown = JSON.parse(stored);
-          if (isDemoState(parsed)) setState(parsed);
+          if (isDemoState(parsed))
+            setState({
+              ...parsed,
+              matchedIds: parsed.bankSync ? parsed.matchedIds : [],
+            });
         }
       } catch {
         /* Disabled or malformed storage falls back to the demo seed. */
@@ -248,15 +252,56 @@ export function DemoProvider({ children }: { children: ReactNode }) {
         "Kiểm tra doanh thu, GTGT và TNCN của mẫu TMĐT",
       );
       await delay(2200, signal);
+      await driver.click('[data-tour="close-dialog"]', "Quay lại hội thoại");
+      show(
+        5,
+        "Đồng bộ ngân hàng & đối soát",
+        "Đồng bộ giao dịch mẫu, mở cặp đã khớp để so MST và tổng tiền, sau đó kiểm tra khoản thanh toán bị lệch.",
+      );
+      router.push("/reconciliation");
+      await driver.wait('[data-tour="reconciliation-empty"]');
+      await driver.click(
+        '[data-tour="reconcile"]',
+        "Đồng bộ sao kê và đối chiếu hóa đơn",
+      );
+      await driver.wait('[data-tour="reconcile-bank-demo"]');
+      await driver.click(
+        '[data-tour="reconcile-bank-demo"]',
+        "Xem khoản 22 triệu khớp hóa đơn vừa lưu",
+      );
+      await driver.wait('[data-tour="reconcile-verdict"]');
+      await driver.move(
+        '[data-tour="reconcile-verdict"]',
+        "MST trùng nhau, tổng tiền bằng nhau, chênh lệch 0",
+      );
+      await delay(1800, signal);
+      await driver.click(
+        '[data-tour="reconcile-full-invoice"]',
+        "Mở hóa đơn nguồn để kiểm chứng",
+      );
+      await delay(1000, signal);
       await driver.click(
         '[data-tour="close-dialog"]',
-        "Hoàn tất bốn tình huống",
+        "Trở về danh sách đối sánh",
+      );
+      await driver.click(
+        '[data-tour="reconcile-bank-02"]',
+        "Kiểm tra giao dịch chưa khớp",
+      );
+      await driver.move(
+        '[data-tour="reconcile-verdict"]',
+        "Ngân hàng 20 triệu, hóa đơn 20,35 triệu: thiếu 350 nghìn",
+      );
+      await delay(2000, signal);
+      await driver.click(
+        '[data-tour="close-dialog"]',
+        "Hoàn tất trình diễn đối soát",
       );
       if (!signal.aborted && abortRef.current === controller) {
         setTour(null);
         abortRef.current = null;
         notify(
-          "Đã trình diễn đủ 4 tình huống. Bạn có thể tiếp tục khám phá hội thoại.",
+          "Đã trình diễn 5 tình huống, gồm đồng bộ ngân hàng và kiểm tra đối soát. Bạn có thể tiếp tục khám phá.",
         );
       }
     } catch (error) {

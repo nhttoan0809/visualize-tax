@@ -28,6 +28,7 @@ export function Modal({
   onClose,
   wide = false,
   locked = false,
+  className = "",
 }: {
   title: string;
   subtitle?: string;
@@ -35,6 +36,7 @@ export function Modal({
   onClose: () => void;
   wide?: boolean;
   locked?: boolean;
+  className?: string;
 }) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const id = useId();
@@ -90,7 +92,7 @@ export function Modal({
         role="dialog"
         aria-modal="true"
         aria-labelledby={id}
-        className={`modal ${wide ? "modal-wide" : ""}`}
+        className={`modal ${wide ? "modal-wide" : ""} ${className}`}
       >
         <div className="modal-heading">
           <div>

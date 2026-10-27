@@ -1,4 +1,4 @@
-import { type Invoice } from "./demo-data";
+import { type BankTransaction, type Invoice } from "./demo-data";
 
 // Fictional identities. DEMO-prefixed tax/bank identifiers cannot be mistaken for real accounts.
 export const business = {
@@ -195,13 +195,7 @@ export const formReferences = {
   household: "https://chinhphu.vn/?classid=0&docid=213883&pageid=27160",
 };
 
-export function bankDetails(transaction: {
-  id: string;
-  invoiceId: string;
-  date: string;
-  text: string;
-  amount: number;
-}) {
+export function bankDetails(transaction: BankTransaction) {
   const position = Number(transaction.id.replace("bank-", "")) || 7;
   return {
     reference: `DEMO-FT26${transaction.date.slice(0, 2)}${String(position).padStart(6, "0")}`,
@@ -209,16 +203,9 @@ export function bankDetails(transaction: {
     valueDate: transaction.date,
     account: "DEMO-1028-2468",
     accountName: business.name,
-    sender:
-      transaction.invoiceId === "inv-demo"
-        ? "XUONG GIAY NHO"
-        : ({
-            "inv-01": "CONG TY THIET KE MOC",
-            "inv-02": "CUA HANG AN NHIEN",
-            "inv-03": "STUDIO SANG",
-            "inv-04": "CONG TY GOM VIET",
-            "inv-06": "CA PHE THANG MUOI",
-          }[transaction.invoiceId] ?? "KHACH HANG CHUA XAC DINH"),
+    sender: transaction.payerName,
+    payerTaxId: transaction.payerTaxId,
+    payeeTaxId: transaction.payeeTaxId,
     senderAccount: `DEMO-7900-${String(position).padStart(4, "0")}`,
     direction: "credit" as const,
     currency: "VND",
