@@ -35,6 +35,7 @@ import {
 } from "lucide-react";
 import { useDemo } from "./demo-provider";
 import { Modal } from "./ui";
+import { PresentationPicker } from "./presentation-picker";
 import { FeatureDescription } from "./feature-description";
 
 const navigation = [
@@ -65,6 +66,7 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
   );
   const [help, setHelp] = useState(false);
   const [features, setFeatures] = useState(false);
+  const [tourPicker, setTourPicker] = useState(false);
   const [search, setSearch] = useState(false);
   const [query, setQuery] = useState("");
   const [notifications, setNotifications] = useState(false);
@@ -109,6 +111,7 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
   const pending = state.invoices.filter((i) => i.status === "review").length;
   const closeHelp = useCallback(() => setHelp(false), []);
   const closeFeatures = useCallback(() => setFeatures(false), []);
+  const closeTourPicker = useCallback(() => setTourPicker(false), []);
   const closeSearch = useCallback(() => {
     setSearch(false);
     setQuery("");
@@ -127,13 +130,20 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
           </span>
         </div>
         <div className="banner-actions">
-          <button disabled={!!tour} onClick={() => setFeatures(true)}>
+          <button
+            disabled={!!tour}
+            onClick={() => {
+              setTourPicker(false);
+              setFeatures(true);
+            }}
+          >
             <Info size={13} />
             Mô tả tính năng
           </button>
           <button
             onClick={() => {
               setHelp(false);
+              setTourPicker(false);
               setFeatures(false);
               setSearch(false);
               setQuery("");
@@ -163,7 +173,7 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
                 setQuery("");
                 setNotifications(false);
                 setMobileOpen(false);
-                void startTour();
+                setTourPicker(true);
               }}
               disabled={!ready}
             >
@@ -350,6 +360,15 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
             <span>Được xây dựng để khám phá.</span>
           </footer>
         </div>
+        {tourPicker && (
+          <PresentationPicker
+            onClose={closeTourPicker}
+            onStart={(scenario) => {
+              setTourPicker(false);
+              void startTour(scenario);
+            }}
+          />
+        )}
         {features && <FeatureDescription onClose={closeFeatures} />}
         {help && (
           <Modal
@@ -442,15 +461,19 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
             aria-label="Trình diễn tự động"
           >
             <div className="tour-progress-track">
-              <span style={{ width: `${(tour.step / 5) * 100}%` }} />
+              <span style={{ width: `${(tour.step / tour.total) * 100}%` }} />
             </div>
             <div className="tour-controller-content">
               <span className="tour-step">
                 {tour.step}
-                <small>/ 5</small>
+                <small>/ {tour.total}</small>
               </span>
               <div aria-live="polite" aria-atomic="true">
-                <span className="tour-label">Đang trình diễn tự động</span>
+                <span className="tour-label">
+                  {tour.scenario === "assistant"
+                    ? "Kịch bản 1 · Trợ lý thuế"
+                    : "Kịch bản 2 · Đồng bộ & đối soát"}
+                </span>
                 <h2>{tour.title}</h2>
                 <p>{tour.text}</p>
               </div>

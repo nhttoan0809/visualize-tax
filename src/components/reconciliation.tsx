@@ -69,6 +69,7 @@ export function Reconciliation() {
           className="button primary"
           data-tour="reconcile"
           disabled={busy}
+          aria-busy={busy}
           onClick={sync}
         >
           {busy ? <Spinner /> : <RefreshCw size={16} />}{" "}
@@ -78,6 +79,7 @@ export function Reconciliation() {
       <section
         className="panel reconciliation-results"
         aria-label="Kết quả đối soát"
+        aria-busy={busy}
       >
         <div className="panel-heading">
           <div>
@@ -90,6 +92,26 @@ export function Reconciliation() {
           </div>
           <span className="demo-pill">Tháng 10/2026 · Dữ liệu mẫu</span>
         </div>
+        {busy && (
+          <div className="sync-loading" role="status" data-tour="sync-loading">
+            <span className="sync-loading-icon">
+              <RefreshCw size={24} className="spin" />
+            </span>
+            <div>
+              <strong>Đang đồng bộ & đối soát dữ liệu</strong>
+              <p>
+                Đang mô phỏng tải sao kê → kiểm tra MST → so sánh tổng thanh
+                toán…
+              </p>
+              <div className="sync-loading-track" aria-hidden="true">
+                <i />
+              </div>
+              <span className="sync-loading-stages">
+                Giao dịch ngân hàng · Hóa đơn đã duyệt · Kết quả đối sánh
+              </span>
+            </div>
+          </div>
+        )}
         <div className="reconciliation-metrics">
           <div>
             <small>Đã đồng bộ</small>
@@ -129,6 +151,7 @@ export function Reconciliation() {
               <button
                 key={key}
                 onClick={() => setFilter(key)}
+                disabled={busy}
                 className={filter === key ? "selected" : ""}
                 aria-pressed={filter === key}
               >
@@ -140,6 +163,7 @@ export function Reconciliation() {
         </div>
         <div
           className="table-scroll"
+          inert={busy}
           role="region"
           aria-label="Bảng đối sánh, cuộn ngang để xem đầy đủ"
           tabIndex={0}
@@ -241,7 +265,7 @@ export function Reconciliation() {
             </tbody>
           </table>
         </div>
-        {!transactions.length ? (
+        {!transactions.length && !busy ? (
           <div
             className="reconciliation-empty"
             data-tour="reconciliation-empty"
@@ -278,21 +302,13 @@ export function Reconciliation() {
               </span>
             </div>
           </div>
-        ) : !visible.length ? (
+        ) : !visible.length && !busy ? (
           <div className="empty-state">
             <GitCompareArrows size={28} />
             <h3>Không có kết quả trong nhóm này</h3>
             <p>Chọn bộ lọc khác để xem giao dịch.</p>
           </div>
         ) : null}
-        {busy && (
-          <div className="sync-progress" role="status">
-            <Spinner />
-            <span>
-              Đang mô phỏng tải sao kê → kiểm tra MST → so sánh tổng thanh toán…
-            </span>
-          </div>
-        )}
         <div className="table-pagination">
           <span>
             {transactions.length

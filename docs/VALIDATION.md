@@ -1,13 +1,13 @@
 # Kết quả kiểm tra
 
-Kiểm tra ngày 27/10/2026 (Asia/Ho_Chi_Minh).
+Kiểm tra ngày 28/10/2026 (Asia/Ho_Chi_Minh).
 
 | Kiểm tra                    | Kết quả                                                                                                                                                                                                                  |
 | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `pnpm lint`                 | Qua, không có lỗi/cảnh báo mã nguồn                                                                                                                                                                                      |
 | `pnpm typecheck`            | Qua                                                                                                                                                                                                                      |
 | `pnpm format:check`         | Qua                                                                                                                                                                                                                      |
-| `pnpm test:e2e`             | **30/30 qua**, desktop 1440 px và mobile 375 px; kiểm thử chiều cao bổ sung ở 768 và 1024 px                                                                                                                             |
+| `pnpm test:e2e`             | **36/36 qua**, desktop 1440 px và mobile 375 px; kiểm thử chiều cao bổ sung ở 768 và 1024 px                                                                                                                             |
 | `pnpm build`                | Qua; toàn bộ 5 màn hình ứng dụng prerender static                                                                                                                                                                        |
 | Production qua `pnpm start` | Cả 5 route trả HTTP 200; không có lỗi JavaScript trên trình duyệt                                                                                                                                                        |
 | Responsive                  | Không tràn ngang toàn trang ở 375, 768 và 1440 px; bảng cuộn trong container                                                                                                                                             |
@@ -20,7 +20,7 @@ Các kiểm thử mới xác nhận đủ bốn tình huống ngay trong Trợ l
 
 Các kiểm thử bao gồm luồng liên thông, localStorage qua reload, reset sau thay đổi, hủy trích xuất, trình diễn hoàn tất/dừng/Escape, storage không hợp lệ/bị chặn, validate file, không upload file, tìm nhanh và focus bàn phím, menu mobile, sticky banner và kiểm tra tràn ngang.
 
-Ảnh màn hình: [Đối soát ban đầu](reconciliation-empty.png), [Bảng kết quả đối soát](reconciliation-desktop.png), [Popup chi tiết](reconciliation-detail.png), [Tổng quan](preview-desktop.png), [Trợ lý thuế](assistant-desktop.png), [Phản hồi kèm biểu đồ](assistant-results.png).
+Ảnh màn hình: [Chọn kịch bản](presentation-picker.png), [Loading đồng bộ](sync-loading.png), [Đối soát ban đầu](reconciliation-empty.png), [Bảng kết quả đối soát](reconciliation-desktop.png), [Popup chi tiết](reconciliation-detail.png), [Tổng quan](preview-desktop.png), [Trợ lý thuế](assistant-desktop.png), [Phản hồi kèm biểu đồ](assistant-results.png).
 
 GitHub/Vercel chưa được kiểm tra deployment thật vì công cụ MCP tương ứng chưa được cung cấp cho phiên làm việc; xem [DEPLOYMENT.md](DEPLOYMENT.md).
 
@@ -37,5 +37,11 @@ GitHub/Vercel chưa được kiểm tra deployment thật vì công cụ MCP tư
 - Khởi tạo và reset: không có giao dịch hay kết quả đối soát. Hủy đồng bộ đang chờ không ghi kết quả trễ.
 - Đồng bộ thay thế snapshot, lưu thời gian đồng bộ và giữ kết quả qua reload; lần hai không nhân đôi dòng. Workspace cũ giữ hóa đơn nhưng không tự tạo kết quả ngân hàng.
 - Bảng kết quả ở đầu trang; click dòng mở dialog rộng có MST hai bên, tiền ghi Có, tổng hóa đơn, chênh lệch, bản ghi ngân hàng và chứng từ hóa đơn. Chênh lệch tính theo ngân hàng trừ tổng hóa đơn.
-- Sáu giao dịch seed sau đồng bộ: bốn khớp, hai lệch (-350.000 và -4.500.000 đồng). Trình diễn thêm hóa đơn mới rồi đồng bộ thành bảy giao dịch, năm khớp và hai lệch.
-- Trình diễn có năm bước; case cuối mở cặp 22 triệu khớp và cặp An Nhiên lệch tiền, ghi nhận click sync, popup và mở nguồn.
+- Sáu giao dịch seed sau đồng bộ: bốn khớp, hai lệch (-350.000 và -4.500.000 đồng). Kịch bản đối soát độc lập cũng dùng sáu giao dịch này, không chạy nhập hóa đơn ở chatbot.
+- Trình diễn được chọn qua dialog: Trợ lý thuế có bốn bước; Đồng bộ & đối soát có ba bước, mở cặp Studio Sáng khớp và cặp An Nhiên lệch tiền. Kiểm thử ghi nhận click sync, popup và mở nguồn, đồng thời xác nhận kịch bản đối soát không tạo hội thoại hoặc tờ khai.
+
+## Chọn kịch bản & loading — 28/10/2026
+
+- Dialog có hai lựa chọn, mục đích và đường đi; Escape đóng và trả focus về nút banner. Mở/đóng dialog giữ nguyên storage.
+- Hai kịch bản chạy đến cuối với chuyển động/gõ phím bình thường trên desktop/mobile; xác nhận tách biệt trạng thái, số bước và các handler được gọi.
+- Loading đồng bộ có spinner, thanh indeterminate, nhãn busy; chống click lặp, khóa tương tác bảng/bộ lọc. Dừng trình diễn trong lúc loading hủy request và không ghi snapshot trễ.

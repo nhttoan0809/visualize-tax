@@ -158,82 +158,114 @@ test("reset clears app state, filters and pending extraction while preserving un
   await expect(page.getByText("Hiển thị 6 / 6 hóa đơn")).toBeVisible();
 });
 
-test("complete automated presentation unlocks and carries data across every step", async ({
-  page,
-}) => {
-  test.setTimeout(90000);
-  await page.emulateMedia({ reducedMotion: "no-preference" });
-  await ready(page, "/declarations");
-  await page.evaluate(() => {
-    const record = { typed: 0, shortcuts: 0, moves: 0, clicks: [] as string[] };
-    Object.assign(window, { presentationRecord: record });
-    document.addEventListener("input", (e) => {
-      if ((e.target as HTMLElement)?.id === "chat-input") record.typed++;
+for (const scenario of ["assistant", "reconciliation"] as const) {
+  test(`complete ${scenario} presentation stays within its selected workflow`, async ({
+    page,
+  }) => {
+    test.setTimeout(90000);
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await ready(page, "/declarations");
+    await page.evaluate(() => {
+      const record = {
+        typed: 0,
+        shortcuts: 0,
+        moves: 0,
+        clicks: [] as string[],
+      };
+      Object.assign(window, { presentationRecord: record });
+      document.addEventListener("input", (e) => {
+        if ((e.target as HTMLElement)?.id === "chat-input") record.typed++;
+      });
+      document.addEventListener("keydown", (e) => {
+        if (e.ctrlKey && e.key === "Enter") record.shortcuts++;
+      });
+      document.addEventListener("pointermove", () => record.moves++);
+      document.addEventListener("click", (e) => {
+        const name = (e.target as HTMLElement)?.closest<HTMLElement>(
+          "[data-tour]",
+        )?.dataset.tour;
+        if (name) record.clicks.push(name);
+      });
     });
-    document.addEventListener("keydown", (e) => {
-      if (e.ctrlKey && e.key === "Enter") record.shortcuts++;
-    });
-    document.addEventListener("pointermove", () => record.moves++);
-    document.addEventListener("click", (e) => {
-      const name = (e.target as HTMLElement)?.closest<HTMLElement>(
-        "[data-tour]",
-      )?.dataset.tour;
-      if (name) record.clicks.push(name);
-    });
+    await page
+      .getByRole("button", { name: "Chạy trình diễn", exact: true })
+      .click();
+    await page.locator(`[data-tour="choose-${scenario}"]`).click();
+    await expect(page.locator(".application")).toHaveAttribute("inert", "");
+    await expect(
+      page.getByRole("region", { name: "Trình diễn tự động" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Chạy trình diễn", exact: true }),
+    ).toBeVisible({ timeout: 85000 });
+    await expect(page.locator(".application")).not.toHaveAttribute("inert", "");
+    await expect(page).toHaveURL(
+      scenario === "assistant" ? /assistant/ : /reconciliation/,
+    );
+    const state = await page.evaluate(() =>
+      JSON.parse(localStorage.getItem("visualize-tax:demo:v1")!),
+    );
+    if (scenario === "assistant") {
+      expect(state.invoices).toHaveLength(7);
+      expect(
+        state.declarations.map((d: { form: string }) => d.form).sort(),
+      ).toEqual(["01/GTGT", "02/CNKD"]);
+      expect(state.matchedIds).toHaveLength(0);
+      expect(state.bankSync).toBeUndefined();
+      expect(
+        state.messages.some((m: { text: string }) =>
+          m.text.includes("98.500.000"),
+        ),
+      ).toBe(true);
+    } else {
+      expect(state.invoices).toHaveLength(6);
+      expect(state.messages).toHaveLength(0);
+      expect(state.declarations).toHaveLength(0);
+      expect(state.bankSync.transactions).toHaveLength(6);
+      expect(state.matchedIds).toHaveLength(4);
+    }
+    const record = await page.evaluate(
+      () =>
+        (
+          window as unknown as {
+            presentationRecord: {
+              typed: number;
+              shortcuts: number;
+              moves: number;
+              clicks: string[];
+            };
+          }
+        ).presentationRecord,
+    );
+    if (scenario === "assistant") {
+      expect(record.typed).toBeGreaterThan(100);
+      expect(record.shortcuts).toBe(4);
+      for (const action of [
+        "chat-use-sample",
+        "chat-save-invoice",
+        "chat-view-invoice",
+        "chat-preview-01-GTGT",
+        "chat-preview-02-CNKD",
+        "declaration-source",
+      ])
+        expect(record.clicks).toContain(action);
+      expect(record.clicks).not.toContain("reconcile");
+    } else {
+      expect(record.typed).toBe(0);
+      expect(record.shortcuts).toBe(0);
+      for (const action of [
+        "reconcile",
+        "reconcile-bank-03",
+        "reconcile-bank-02",
+        "reconcile-full-invoice",
+      ])
+        expect(record.clicks).toContain(action);
+      expect(record.clicks).not.toContain("chat-use-sample");
+    }
+    expect(record.moves).toBeGreaterThan(8);
+    await expect(page.locator(".demo-pointer")).toHaveCount(0);
   });
-  await page
-    .getByRole("button", { name: "Chạy trình diễn", exact: true })
-    .click();
-  await expect(page.locator(".application")).toHaveAttribute("inert", "");
-  await expect(
-    page.getByRole("region", { name: "Trình diễn tự động" }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("button", { name: "Chạy trình diễn", exact: true }),
-  ).toBeVisible({ timeout: 85000 });
-  await expect(page.locator(".application")).not.toHaveAttribute("inert", "");
-  await expect(page).toHaveURL(/reconciliation/);
-  const state = await page.evaluate(() =>
-    JSON.parse(localStorage.getItem("visualize-tax:demo:v1")!),
-  );
-  expect(state.invoices).toHaveLength(7);
-  expect(state.declarations).toHaveLength(2);
-  expect(state.matchedIds).toHaveLength(5);
-  expect(state.bankSync.transactions).toHaveLength(7);
-  expect(
-    state.messages.some((m: { text: string }) => m.text.includes("98.500.000")),
-  ).toBe(true);
-  expect(
-    state.declarations.map((d: { form: string }) => d.form).sort(),
-  ).toEqual(["01/GTGT", "02/CNKD"]);
-  const record = await page.evaluate(
-    () =>
-      (
-        window as unknown as {
-          presentationRecord: {
-            typed: number;
-            shortcuts: number;
-            moves: number;
-            clicks: string[];
-          };
-        }
-      ).presentationRecord,
-  );
-  expect(record.typed).toBeGreaterThan(100);
-  expect(record.shortcuts).toBe(4);
-  expect(record.moves).toBeGreaterThan(8);
-  expect(record.clicks).toContain("chat-use-sample");
-  expect(record.clicks).toContain("chat-save-invoice");
-  expect(record.clicks).toContain("chat-view-invoice");
-  expect(record.clicks).toContain("chat-preview-01-GTGT");
-  expect(record.clicks).toContain("chat-preview-02-CNKD");
-  expect(record.clicks).toContain("declaration-source");
-  expect(record.clicks).toContain("reconcile");
-  expect(record.clicks).toContain("reconcile-bank-demo");
-  expect(record.clicks).toContain("reconcile-bank-02");
-  expect(record.clicks).toContain("reconcile-full-invoice");
-  await expect(page.locator(".demo-pointer")).toHaveCount(0);
-});
+}
 
 test("presentation can stop during extraction and Escape immediately returns interaction", async ({
   page,
@@ -242,6 +274,7 @@ test("presentation can stop during extraction and Escape immediately returns int
   await page
     .getByRole("button", { name: "Chạy trình diễn", exact: true })
     .click();
+  await page.locator('[data-tour="choose-assistant"]').click();
   await expect(page.locator(".chat-processing [role=status]")).toBeVisible({
     timeout: 15000,
   });
@@ -263,6 +296,7 @@ test("presentation can stop during extraction and Escape immediately returns int
   await page
     .getByRole("button", { name: "Chạy trình diễn", exact: true })
     .click();
+  await page.locator('[data-tour="choose-assistant"]').click();
   await page.keyboard.press("Escape");
   await expect(page.locator(".application")).not.toHaveAttribute("inert", "");
   await expect(

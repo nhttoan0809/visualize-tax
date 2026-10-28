@@ -11,9 +11,11 @@ test("reconciliation starts empty, syncs a consistent ledger and opens matched a
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(page.locator(".reconciliation-ledger tbody tr")).toHaveCount(0);
   await page.getByRole("button", { name: syncName, exact: true }).click();
+  await expect(page.locator('[data-tour="sync-loading"]')).toBeVisible();
+  await expect(page.locator('[data-tour="reconcile"]')).toBeDisabled();
   await expect(
-    page.getByRole("status").filter({ hasText: "Đang mô phỏng tải sao kê" }),
-  ).toBeVisible();
+    page.getByRole("region", { name: "Kết quả đối soát", exact: true }),
+  ).toHaveAttribute("aria-busy", "true");
   await expect(page.locator(".reconciliation-ledger tbody tr")).toHaveCount(6);
   const studio = page.getByRole("button", {
     name: "Xem đối chiếu STUDIO SANG HD 126",
