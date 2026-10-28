@@ -66,7 +66,7 @@ src/lib/                    Seed, mock API, persistence validation, export, hủ
 .agents/skills/ui-ux-pro-max Skill Codex ở phạm vi project
 AGENTS.md                   Mục tiêu cuối cùng và giới hạn triển khai
 design-system/             Quyết định thiết kế
-docs/DEPLOYMENT.md          Trạng thái và quy trình triển khai qua MCP
+docs/DEPLOYMENT.md          Trạng thái production và cách triển khai
 tests/                     Kiểm thử hành vi bằng trình duyệt
 ```
 
@@ -98,7 +98,7 @@ Biến này chỉ cấu hình URL kiểm thử và không yêu cầu một serve
 
 ## GitHub và Vercel
 
-Cấu hình Vercel đã sẵn sàng trong `vercel.json`, không cần secret. **Chưa push hoặc deploy** vì phiên làm việc chưa cung cấp công cụ MCP GitHub/Vercel. Xem [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) để tiếp tục đúng yêu cầu triển khai qua MCP khi hai server đã kết nối.
+Production: **https://visualize-tax.vercel.app** — đã deploy ngày 28/10/2026 qua Vercel CLI vì MCP chưa được kết nối. Không cần secret. Chưa push GitHub hoặc bật Git auto-deploy. Xem [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) để biết deployment, commit và kết quả kiểm tra trên URL thật.
 
 Màn Đối soát bắt đầu trống. Chọn **Đồng bộ & đối soát** để lưu snapshot giao dịch mẫu; bảng kết quả nằm ở đầu trang, click từng dòng mở popup kiểm tra hai nguồn: giấy báo Có/bản ghi ngân hàng mô phỏng và chứng từ hóa đơn dựng lại. Chuyển sang Dữ liệu trích xuất để đối chiếu từng trường; chọn giao dịch để xem lý do đã khớp hoặc lệch tiền. MST bên mua/bên chuyển và bên bán/bên nhận dùng chung định danh hư cấu; hai dòng lệch lần lượt 350.000 và 4.500.000 đồng. Đồng bộ lại không nhân bản giao dịch, reset xóa snapshot; dữ liệu lưu cũ chưa đồng bộ sẽ hiển thị danh sách trống.
 

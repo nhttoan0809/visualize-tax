@@ -22,7 +22,7 @@ Các kiểm thử bao gồm luồng liên thông, localStorage qua reload, reset
 
 Ảnh màn hình: [Chọn kịch bản](presentation-picker.png), [Loading đồng bộ](sync-loading.png), [Đối soát ban đầu](reconciliation-empty.png), [Bảng kết quả đối soát](reconciliation-desktop.png), [Popup chi tiết](reconciliation-detail.png), [Tổng quan](preview-desktop.png), [Trợ lý thuế](assistant-desktop.png), [Phản hồi kèm biểu đồ](assistant-results.png).
 
-GitHub/Vercel chưa được kiểm tra deployment thật vì công cụ MCP tương ứng chưa được cung cấp cho phiên làm việc; xem [DEPLOYMENT.md](DEPLOYMENT.md).
+Production Vercel đã triển khai qua CLI ngày 28/10/2026: https://visualize-tax.vercel.app. Đã kiểm tra cả 5 route HTTP 200, hai kịch bản độc lập và reset trên URL thật (desktop/mobile, reduced motion), không có lỗi JavaScript. GitHub chưa push; chi tiết tại [DEPLOYMENT.md](DEPLOYMENT.md).
 
 ## Chi tiết chứng từ và đối soát trực quan — 27/10/2026
 
