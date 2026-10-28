@@ -1,116 +1,136 @@
-# Visualize Tax
+# Visualize Tax · Từ hóa đơn đến tờ khai 🧾
 
-Workspace quản lý thuế bằng tiếng Việt, được xây dựng độc lập từ các luồng nghiệp vụ của `original-tax` để thể hiện năng lực UI/UX và phát triển tính năng. Repo gốc chỉ được đọc tham khảo và không bị thay đổi.
+> **Một workspace tiếng Việt kết nối chứng từ, doanh thu và đối soát trong cùng trải nghiệm — khám phá dữ liệu qua hội thoại, kiểm tra khoản chênh lệch bằng hai nguồn và theo dõi toàn bộ quy trình qua trình diễn tương tác.**
 
-**Demo-site:** [visualize-tax.vercel.app](https://visualize-tax.vercel.app) · **Mã nguồn:** [nhttoan0809/visualize-tax](https://github.com/nhttoan0809/visualize-tax)
+**Dự án của Toàn Nguyễn** · Thiết kế trải nghiệm sản phẩm · Phát triển giao diện tương tác
 
-## Trải nghiệm demo
+[![Live Demo](https://img.shields.io/badge/Demo-visualize--tax.vercel.app-0D9488?style=for-the-badge&logo=vercel)](https://visualize-tax.vercel.app)
+[![Next.js](https://img.shields.io/badge/Next.js-16.4.3-111827?style=for-the-badge&logo=nextdotjs)](TECHNICAL.md#stack)
+[![React](https://img.shields.io/badge/React-19.3-61DAFB?style=for-the-badge&logo=react)](TECHNICAL.md#stack)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-38BDF8?style=for-the-badge&logo=tailwindcss)](TECHNICAL.md#stack)
+[![GSAP](https://img.shields.io/badge/GSAP-3.15-88CE02?style=for-the-badge&logo=greensock)](TECHNICAL.md#stack)
 
-Mở [demo-site](https://visualize-tax.vercel.app), chọn **Chạy trình diễn** trên banner và chọn một trong hai kịch bản:
+[Khám phá demo](https://visualize-tax.vercel.app) · [Tính năng nổi bật](#features) · [Tài liệu kỹ thuật & cài đặt](TECHNICAL.md)
 
-1. **Trợ lý thuế:** nhập ảnh hóa đơn → trích xuất, kiểm tra và lưu → truy vấn doanh thu kèm biểu đồ → tạo bản nháp 01/GTGT và 02/CNKD.
-2. **Đồng bộ & đối soát:** đồng bộ giao dịch ngân hàng mẫu → kiểm tra cặp khớp → đối chiếu MST, tổng tiền và khoản chênh lệch trong popup chi tiết.
+![Visualize Tax — không gian quản lý chứng từ và doanh thu bằng tiếng Việt](docs/preview-desktop.png)
 
-Mỗi kịch bản chạy độc lập từ dữ liệu ban đầu. Dùng **Dừng / Esc** để tiếp tục thao tác thủ công hoặc **Đặt lại** để khôi phục toàn bộ dữ liệu mẫu. Không cần tài khoản đăng nhập.
+_Ảnh giao diện có sẵn trong repo; số liệu minh họa phản ánh trạng thái tại thời điểm chụp. [Nguồn ảnh](docs/SOURCES.md)._
 
-**Đây là phiên bản tái hiện cho portfolio. Tất cả dữ liệu, phản hồi trợ lý, kết quả trích xuất và tờ khai đều là mô phỏng.**
+**Phiên bản tái hiện độc lập dành cho portfolio.** Dữ liệu, trích xuất hóa đơn, phản hồi trợ lý, giao dịch ngân hàng và tờ khai đều là mô phỏng; không có AI hoặc kết nối ngân hàng thực tế. Mẫu in không có giá trị pháp lý.
 
-![Tổng quan Visualize Tax với dữ liệu minh họa](docs/preview-desktop.png)
+---
 
-## Chạy dự án
+## 🌟 Trải Nghiệm Trực Tuyến (Live Website)
 
-Yêu cầu Node.js 22 trở lên và pnpm 10.26.2. Project không cần biến môi trường hay backend.
+**[Mở Visualize Tax ↗](https://visualize-tax.vercel.app)** · Không cần đăng nhập.
 
-```sh
-pnpm install --frozen-lockfile
-pnpm dev
-```
+Chọn **Chạy trình diễn** trên banner để xem một trong hai kịch bản độc lập:
 
-Mở [localhost:3000](http://localhost:3000). Build production:
+1. **Trợ lý thuế:** ảnh hóa đơn → kiểm tra và lưu → doanh thu kèm biểu đồ → xem trước hai bản nháp tờ khai.
+2. **Đồng bộ & đối soát:** tải giao dịch mẫu → xem cặp khớp → kiểm tra cặp lệch tiền và hai chứng từ nguồn.
 
-```sh
-pnpm build
-pnpm start
-```
+Dùng **Dừng / Esc** để trở lại thao tác thủ công; **Đặt lại** để bắt đầu lại với dữ liệu mẫu.
 
-## Trải nghiệm chính
+![Hai kịch bản trình diễn độc lập với mục tiêu và từng bước rõ ràng](docs/presentation-picker.png)
 
-| Màn hình                     | Tính năng                                                                                                                  |
-| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `/` — Tổng quan              | Chỉ số từ trạng thái hiện tại, biểu đồ mẫu có đổi kỳ/xem bảng số liệu, hóa đơn gần đây, xuất CSV                           |
-| `/invoices` — Hóa đơn        | Tìm kiếm, lọc, sắp xếp, kéo thả/chọn file, trích xuất mẫu, xem chi tiết và duyệt                                           |
-| `/reconciliation` — Đối soát | Đồng bộ ngân hàng mẫu; ghép theo số hóa đơn, MST và tổng tiền; bảng khớp/lệch tiền, lọc và popup đối chiếu                 |
-| `/declarations` — Tờ khai    | Chọn 01/GTGT, 01/CNKD hoặc 02/CNKD, chọn kỳ mẫu và thuế suất minh họa, tạo bản nháp, xem trước và in/lưu PDF               |
-| `/assistant` — Trợ lý thuế   | Workspace toàn chiều cao, đính kèm ảnh hóa đơn mẫu, lưu chứng từ, phản hồi có biểu đồ và tạo bản nháp ngay trong hội thoại |
+---
 
-Banner cố định ở mọi trang gồm:
+<a id="overview"></a>
 
-- **Đặt lại:** khôi phục seed, xóa hội thoại/bản nháp, hủy thao tác đang xử lý và đưa về tổng quan. Không xóa dữ liệu của ứng dụng khác.
-- **Mô tả tính năng:** trình bày bài toán quản lý hóa đơn, đối chiếu dòng tiền, phân tích và hỗ trợ kê khai; phân biệt định hướng nghiệp vụ với các tích hợp đang được mô phỏng.
-- **Chạy trình diễn:** mở dialog với hai lựa chọn và mô tả mục đích/luồng. Kịch bản **Trợ lý thuế** chạy độc lập: ảnh → trích xuất/kiểm tra/lưu → doanh thu/biểu đồ → 01/GTGT → 02/CNKD. Kịch bản **Đồng bộ & đối soát** dùng sáu hóa đơn seed: đồng bộ ngân hàng → xem cặp Studio Sáng khớp → xem cặp An Nhiên lệch 350.000 đồng. Chọn kịch bản mới bắt đầu từ seed; mở/đóng dialog không reset dữ liệu. Con trỏ di chuyển, click, nhập từng ký tự và dùng Ctrl + Enter qua chính handler giao diện. Tiến độ 4 hoặc 3 bước tùy kịch bản; nút dừng và Escape luôn hoạt động, dữ liệu đã hoàn tất được giữ lại khi dừng.
+## 📌 Executive Summary (Tổng quan dự án)
 
-Tìm nhanh bằng nút trên thanh đầu trang hoặc `⌘ K` / `Ctrl K`. Menu mobile hỗ trợ bàn phím và Escape. Các animation tôn trọng `prefers-reduced-motion`. Trong Trợ lý, `Alt + I` mở đính kèm; `Enter` hoặc `Ctrl + Enter` gửi tin, `Shift + Enter` xuống dòng.
+| Thông số               | Chi tiết                                                                                                           |
+| :--------------------- | :----------------------------------------------------------------------------------------------------------------- |
+| **Project Name**       | **Visualize Tax**                                                                                                  |
+| **Project Type**       | Sản phẩm mẫu tương tác dành cho portfolio, tái hiện độc lập luồng quản lý thuế                                     |
+| **Đối tượng sử dụng**  | Người xem portfolio, nhà tuyển dụng và lập trình viên muốn khám phá trải nghiệm quản lý chứng từ cho hộ kinh doanh |
+| **Phạm vi phát triển** | Năm màn hình liên thông: Tổng quan, Hóa đơn, Đối soát, Tờ khai và Trợ lý thuế                                      |
+| **Trạng thái**         | Có demo trực tuyến và hai kịch bản trình diễn; toàn bộ nghiệp vụ dùng dữ liệu hư cấu                               |
 
-![Giao diện Trợ lý thuế](docs/assistant-desktop.png)
+---
 
-![Phản hồi doanh thu kèm biểu đồ trong hội thoại](docs/assistant-results.png)
+<a id="problem-solution"></a>
 
-## Dữ liệu và giới hạn
+## 🎯 Problem & Solution (Bài toán & Giải pháp)
 
-- Seed hoàn toàn hư cấu ở `src/lib/demo-data.ts`; kỳ tháng 10/2026 là bối cảnh mô phỏng cố định.
-- Mock API là facade bất đồng bộ chạy trong trình duyệt, có độ trễ và hỗ trợ hủy; không có API nghiệp vụ máy chủ.
-- Trạng thái được lưu với schema version tại key `visualize-tax:demo:v1`. Dữ liệu hỏng hoặc storage bị chặn sẽ dùng seed/in-memory.
-- File người dùng chọn **chỉ cung cấp tên chứng từ**. Nội dung không được đọc hoặc gửi đi. Mọi lần trích xuất đều trả hóa đơn mẫu “Xưởng Giấy Nhỏ”; nhập lại sẽ thay bản mẫu này.
-- Tổng quan lấy chỉ số từ trạng thái thực của demo. Biểu đồ dòng tiền ở Tổng quan là dữ liệu xu hướng riêng; biểu đồ trong Trợ lý được tính trực tiếp từ hóa đơn đã duyệt tại thời điểm trả lời và lưu cùng hội thoại.
-- 01/GTGT mô phỏng thuế đầu ra trừ 2.800.000 đồng thuế đầu vào từ hai chứng từ mua vào giả lập. CNKD mô phỏng phân bổ tổng tỷ lệ thành GTGT và TNCN. Kịch bản hội thoại dùng 10% và 1,5%; không xác định mức thuế áp dụng thực tế. Các kỳ tờ khai dùng cùng bộ hóa đơn mẫu. Xem [nguồn biểu mẫu, giả định và phép tính](docs/FORM-REFERENCES.md).
-- Nút **In / Lưu PDF** mở hộp thoại in của trình duyệt; mẫu in luôn có thông báo không có giá trị pháp lý.
-- Không có đăng ký/đăng nhập, OTP, database, thanh toán, tích hợp ngân hàng hay model AI thật.
+- **Problem:** Chứng từ, doanh thu và giao dịch ngân hàng nằm ở nhiều ngữ cảnh. Người dùng cần biết số liệu đến từ đâu, hóa đơn nào cần kiểm tra và vì sao một khoản thanh toán chưa khớp.
+- **Solution:** Kết nối các bước trong một workspace: duyệt hóa đơn, xem doanh thu, đối chiếu hai nguồn và chuẩn bị bản nháp tờ khai. Hội thoại có biểu đồ và chứng từ giúp khám phá dữ liệu; trình diễn tự động giúp người xem nắm được quy trình mà không cần hướng dẫn riêng.
 
-## Công nghệ và cấu trúc
+---
 
-Next.js App Router · React · TypeScript strict · Tailwind CSS v4/PostCSS · GSAP với `useGSAP` · Lucide · font Be Vietnam Pro tự host · Playwright và axe-core.
+<a id="features"></a>
 
-```text
-src/app/                    Routes, layout, metadata, global styles
-src/components/             Các màn hình, shell, provider và UI dùng chung
-src/lib/                    Seed, mock API, persistence validation, export, hủy tác vụ
-.agents/skills/ui-ux-pro-max Skill Codex ở phạm vi project
-AGENTS.md                   Mục tiêu cuối cùng và giới hạn triển khai
-design-system/             Quyết định thiết kế
-docs/DEPLOYMENT.md          Trạng thái production và cách triển khai
-tests/                     Kiểm thử hành vi bằng trình duyệt
-```
+## ✨ Key Features (Tính năng nổi bật)
 
-Skill [UI/UX Pro Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) đã được cài tại `.agents/skills/ui-ux-pro-max`, pin theo revision ghi trong `PROVENANCE.md`, kèm license upstream. Codex nhận skill project từ lượt làm việc tiếp theo; không ghi đè bản global.
+| Tính năng                        | Giá trị mang lại                                                                                                         |
+| :------------------------------- | :----------------------------------------------------------------------------------------------------------------------- |
+| **🧾 Hóa đơn có thể kiểm tra**   | Tìm kiếm, lọc, xem từng dòng hàng và duyệt chứng từ trước khi đưa vào tổng hợp                                           |
+| **💬 Hội thoại gắn với dữ liệu** | Trải nghiệm đính kèm hóa đơn mẫu, kiểm tra/lưu, xem doanh thu bằng biểu đồ và mở bản nháp ngay trong hội thoại           |
+| **🔎 Đối soát hai nguồn**        | Đặt bản ghi ngân hàng cạnh hóa đơn, chỉ rõ mã số thuế, tổng tiền và khoản chênh lệch cần xem xét                         |
+| **📄 Tờ khai có nguồn số liệu**  | Xem trước bản nháp minh họa, mở hóa đơn nguồn và in/lưu PDF từ trình duyệt                                               |
+| **▶️ Trình diễn tương tác**      | Hai kịch bản tự thao tác qua từng bước, có tiến độ, con trỏ minh họa và khả năng dừng bất kỳ lúc nào                     |
+| **📱 Trải nghiệm liền mạch**     | Giao diện tiếng Việt trên desktop/mobile, tìm nhanh, thao tác bàn phím và khôi phục phiên làm việc trên cùng trình duyệt |
 
-## Kiểm tra
+### 💬 Từ chứng từ đến biểu đồ trong cùng hội thoại
 
-Cài Chromium cho Playwright một lần:
+Trợ lý mô phỏng đưa kết quả vào các thẻ có thể thao tác: kiểm tra hóa đơn, lưu vào workspace và xem doanh thu từ hóa đơn đã duyệt. Người xem có thể đi tiếp sang tờ khai mà vẫn giữ ngữ cảnh.
 
-```sh
-pnpm exec playwright install --only-shell chromium
-```
+![Trợ lý thuế hiển thị doanh thu và biểu đồ từ hóa đơn đã duyệt](docs/assistant-results.png)
 
-```sh
-pnpm lint
-pnpm typecheck
-pnpm test:e2e
-pnpm build
-pnpm format:check
-```
+### 🔎 Khoản chênh lệch có thể giải thích
 
-Bộ kiểm thử chạy trên desktop 1440 px và mobile 375 px, bao gồm luồng liên thông, persist sau reload, reset và hủy tác vụ, trình diễn hoàn tất/dừng/Escape, storage bị lỗi/bị chặn, kiểm tra file, responsive, sticky banner và kiểm tra accessibility tự động. Playwright dùng port 3002 và tự chạy dev server nếu chưa có. Báo cáo tạo ở `playwright-report/` (được gitignore). Nếu đã chạy dev server ở cổng khác, dùng đúng hostname đã khởi động:
+Sau khi đồng bộ dữ liệu mẫu, mở từng dòng để đối chiếu bản ghi ngân hàng và hóa đơn. Ví dụ bên dưới cho thấy khoản thiếu **350.000 đồng**; đây là tình huống hư cấu để thể hiện trải nghiệm kiểm tra sai lệch.
 
-```sh
-PLAYWRIGHT_BASE_URL=http://localhost:3000 pnpm test:e2e
-```
+![Đối chiếu song song bản ghi ngân hàng và hóa đơn, hiển thị khoản lệch 350.000 đồng](docs/reconciliation-detail.png)
 
-Biến này chỉ cấu hình URL kiểm thử và không yêu cầu một server thứ hai. Kiểm thử trình diễn chạy cả chuyển động/gõ ký tự bình thường và xác nhận hai kịch bản chạy độc lập, không gọi nhầm luồng của nhau; có kiểm tra picker, focus và dừng khi đồng bộ đang loading.
+<details>
+<summary>📷 Xem thêm bảng kết quả và trạng thái đồng bộ</summary>
 
-## GitHub và Vercel
+![Bảng kết quả đối soát sau khi đồng bộ dữ liệu mẫu](docs/reconciliation-desktop.png)
 
-Production: [visualize-tax.vercel.app](https://visualize-tax.vercel.app), triển khai ngày 28/10/2026 qua Vercel CLI. Repository: [nhttoan0809/visualize-tax](https://github.com/nhttoan0809/visualize-tax), nhánh `main`, private. GitHub được cập nhật qua Git/GitHub API vì MCP chưa kết nối. Chưa bật Git auto-deploy; cập nhật mã nguồn trên GitHub không tự triển khai Vercel. Xem [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) để biết deployment, commit ứng dụng và kết quả kiểm tra trên URL thật.
+![Trạng thái đang đồng bộ với chỉ báo xử lý rõ ràng](docs/sync-loading.png)
 
-Màn Đối soát bắt đầu trống. Chọn **Đồng bộ & đối soát** để lưu snapshot giao dịch mẫu; bảng kết quả nằm ở đầu trang, click từng dòng mở popup kiểm tra hai nguồn: giấy báo Có/bản ghi ngân hàng mô phỏng và chứng từ hóa đơn dựng lại. Chuyển sang Dữ liệu trích xuất để đối chiếu từng trường; chọn giao dịch để xem lý do đã khớp hoặc lệch tiền. MST bên mua/bên chuyển và bên bán/bên nhận dùng chung định danh hư cấu; hai dòng lệch lần lượt 350.000 và 4.500.000 đồng. Đồng bộ lại không nhân bản giao dịch, reset xóa snapshot; dữ liệu lưu cũ chưa đồng bộ sẽ hiển thị danh sách trống.
+</details>
 
-Khi đồng bộ ngân hàng, nút và vùng kết quả có trạng thái busy, spinner và thanh loading indeterminate. Bộ lọc và bảng tạm khóa trong khi xử lý; không có tỷ lệ phần trăm tiến độ giả.
+---
+
+<a id="contributions"></a>
+
+## 👨‍💻 Competencies & Contributions (Năng lực & Đóng góp)
+
+Các năng lực thể hiện qua sản phẩm:
+
+- **Tư duy sản phẩm:** kết nối hóa đơn, đối soát và tờ khai thành luồng có thể trải nghiệm xuyên suốt, thay vì các màn hình rời rạc.
+- **Thiết kế thông tin:** đưa chứng từ nguồn, chỉ số và lý do sai lệch vào đúng ngữ cảnh để người dùng tự kiểm tra kết quả.
+- **Thiết kế tương tác:** xây dựng hội thoại có thẻ kết quả, trạng thái chờ, trình diễn có thể dừng và thao tác bàn phím.
+- **Chú trọng chất lượng:** xử lý phiên làm việc, đặt lại dữ liệu, kích thước màn hình và khả năng tiếp cận; bằng chứng kiểm tra nằm trong [tài liệu kỹ thuật](TECHNICAL.md#highlights).
+
+---
+
+<a id="roadmap"></a>
+
+## 📈 Future Roadmap (Hướng phát triển)
+
+Các hướng đề xuất cho phiên bản portfolio tiếp theo:
+
+- [ ] Bổ sung kịch bản thanh toán từng phần và nhiều giao dịch cho một hóa đơn.
+- [ ] Mở rộng hướng dẫn theo ngữ cảnh cho người dùng lần đầu.
+- [ ] Thêm bộ dữ liệu hư cấu đa dạng để so sánh nhiều tình huống xử lý chứng từ.
+
+---
+
+<a id="author"></a>
+
+## 👤 Author & Contact
+
+- **Tác giả:** Toàn Nguyễn
+- **GitHub:** [@nhttoan0809](https://github.com/nhttoan0809)
+- **Ccùng tác giả:** [@toanb1805926](https://github.com/toanb1805926), [@toannguyen-ailogy](https://github.com/toannguyen-ailogy)
+
+---
+
+<a id="license"></a>
+
+## 📄 License
+
+Xem [thông tin giấy phép và tài nguyên bên thứ ba](TECHNICAL.md#license).
