@@ -2,6 +2,17 @@
 
 Workspace quản lý thuế bằng tiếng Việt, được xây dựng độc lập từ các luồng nghiệp vụ của `original-tax` để thể hiện năng lực UI/UX và phát triển tính năng. Repo gốc chỉ được đọc tham khảo và không bị thay đổi.
 
+**Demo-site:** [visualize-tax.vercel.app](https://visualize-tax.vercel.app) · **Mã nguồn:** [toannguyen-ailogy/visualize-tax](https://github.com/toannguyen-ailogy/visualize-tax)
+
+## Trải nghiệm demo
+
+Mở [demo-site](https://visualize-tax.vercel.app), chọn **Chạy trình diễn** trên banner và chọn một trong hai kịch bản:
+
+1. **Trợ lý thuế:** nhập ảnh hóa đơn → trích xuất, kiểm tra và lưu → truy vấn doanh thu kèm biểu đồ → tạo bản nháp 01/GTGT và 02/CNKD.
+2. **Đồng bộ & đối soát:** đồng bộ giao dịch ngân hàng mẫu → kiểm tra cặp khớp → đối chiếu MST, tổng tiền và khoản chênh lệch trong popup chi tiết.
+
+Mỗi kịch bản chạy độc lập từ dữ liệu ban đầu. Dùng **Dừng / Esc** để tiếp tục thao tác thủ công hoặc **Đặt lại** để khôi phục toàn bộ dữ liệu mẫu. Không cần tài khoản đăng nhập.
+
 **Đây là phiên bản tái hiện cho portfolio. Tất cả dữ liệu, phản hồi trợ lý, kết quả trích xuất và tờ khai đều là mô phỏng.**
 
 ![Tổng quan Visualize Tax với dữ liệu minh họa](docs/preview-desktop.png)
@@ -28,7 +39,7 @@ pnpm start
 | ---------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | `/` — Tổng quan              | Chỉ số từ trạng thái hiện tại, biểu đồ mẫu có đổi kỳ/xem bảng số liệu, hóa đơn gần đây, xuất CSV                           |
 | `/invoices` — Hóa đơn        | Tìm kiếm, lọc, sắp xếp, kéo thả/chọn file, trích xuất mẫu, xem chi tiết và duyệt                                           |
-| `/reconciliation` — Đối soát | Ghép hóa đơn đã duyệt với giao dịch mẫu theo tổng thanh toán; lọc đã khớp/chưa khớp                                        |
+| `/reconciliation` — Đối soát | Đồng bộ ngân hàng mẫu; ghép theo số hóa đơn, MST và tổng tiền; bảng khớp/lệch tiền, lọc và popup đối chiếu                 |
 | `/declarations` — Tờ khai    | Chọn 01/GTGT, 01/CNKD hoặc 02/CNKD, chọn kỳ mẫu và thuế suất minh họa, tạo bản nháp, xem trước và in/lưu PDF               |
 | `/assistant` — Trợ lý thuế   | Workspace toàn chiều cao, đính kèm ảnh hóa đơn mẫu, lưu chứng từ, phản hồi có biểu đồ và tạo bản nháp ngay trong hội thoại |
 
@@ -98,7 +109,7 @@ Biến này chỉ cấu hình URL kiểm thử và không yêu cầu một serve
 
 ## GitHub và Vercel
 
-Production: **https://visualize-tax.vercel.app** — đã deploy ngày 28/10/2026 qua Vercel CLI vì MCP chưa được kết nối. Không cần secret. Chưa push GitHub hoặc bật Git auto-deploy. Xem [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) để biết deployment, commit và kết quả kiểm tra trên URL thật.
+Production: [visualize-tax.vercel.app](https://visualize-tax.vercel.app), triển khai ngày 28/10/2026 qua Vercel CLI. Repository: [toannguyen-ailogy/visualize-tax](https://github.com/toannguyen-ailogy/visualize-tax), nhánh `main`, private. GitHub được cập nhật qua Git/GitHub API vì MCP chưa kết nối. Chưa bật Git auto-deploy; cập nhật mã nguồn trên GitHub không tự triển khai Vercel. Xem [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) để biết deployment, commit ứng dụng và kết quả kiểm tra trên URL thật.
 
 Màn Đối soát bắt đầu trống. Chọn **Đồng bộ & đối soát** để lưu snapshot giao dịch mẫu; bảng kết quả nằm ở đầu trang, click từng dòng mở popup kiểm tra hai nguồn: giấy báo Có/bản ghi ngân hàng mô phỏng và chứng từ hóa đơn dựng lại. Chuyển sang Dữ liệu trích xuất để đối chiếu từng trường; chọn giao dịch để xem lý do đã khớp hoặc lệch tiền. MST bên mua/bên chuyển và bên bán/bên nhận dùng chung định danh hư cấu; hai dòng lệch lần lượt 350.000 và 4.500.000 đồng. Đồng bộ lại không nhân bản giao dịch, reset xóa snapshot; dữ liệu lưu cũ chưa đồng bộ sẽ hiển thị danh sách trống.
 
