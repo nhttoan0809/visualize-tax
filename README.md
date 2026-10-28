@@ -2,17 +2,25 @@
 
 > **Một workspace tiếng Việt kết nối chứng từ, doanh thu và đối soát trong cùng trải nghiệm — khám phá dữ liệu qua hội thoại, kiểm tra khoản chênh lệch bằng hai nguồn và theo dõi toàn bộ quy trình qua trình diễn tương tác.**
 
+<div align="center">
+  <h3>🚀 Trải nghiệm Visualize Tax trực tiếp</h3>
+  <p>Không cần đăng nhập · Chọn “Chạy trình diễn” để khám phá hai kịch bản.</p>
+  <a href="https://visualize-tax.vercel.app">
+    <img src="https://img.shields.io/badge/%E2%96%B6_OPEN_LIVE_DEMO-0D9488?style=for-the-badge" alt="Mở demo Visualize Tax" height="42" />
+  </a>
+  <p><a href="https://visualize-tax.vercel.app"><strong>visualize-tax.vercel.app ↗</strong></a></p>
+</div>
+
 **Dự án của Toàn Nguyễn** · Thiết kế trải nghiệm sản phẩm · Phát triển giao diện tương tác
 
-[![Live Demo](https://img.shields.io/badge/Demo-visualize--tax.vercel.app-0D9488?style=for-the-badge&logo=vercel)](https://visualize-tax.vercel.app)
 [![Next.js](https://img.shields.io/badge/Next.js-16.4.3-111827?style=for-the-badge&logo=nextdotjs)](TECHNICAL.md#stack)
 [![React](https://img.shields.io/badge/React-19.3-61DAFB?style=for-the-badge&logo=react)](TECHNICAL.md#stack)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-38BDF8?style=for-the-badge&logo=tailwindcss)](TECHNICAL.md#stack)
 [![GSAP](https://img.shields.io/badge/GSAP-3.15-88CE02?style=for-the-badge&logo=greensock)](TECHNICAL.md#stack)
 
-[Khám phá demo](https://visualize-tax.vercel.app) · [Tính năng nổi bật](#features) · [Tài liệu kỹ thuật & cài đặt](TECHNICAL.md)
+[Tính năng nổi bật](#features) · [Tài liệu kỹ thuật & cài đặt](TECHNICAL.md)
 
-![Visualize Tax — không gian quản lý chứng từ và doanh thu bằng tiếng Việt](docs/preview-desktop.png)
+[![Visualize Tax — không gian quản lý chứng từ và doanh thu bằng tiếng Việt](docs/preview-desktop.png)](https://visualize-tax.vercel.app)
 
 _Ảnh giao diện có sẵn trong repo; số liệu minh họa phản ánh trạng thái tại thời điểm chụp. [Nguồn ảnh](docs/SOURCES.md)._
 
