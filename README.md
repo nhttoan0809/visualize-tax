@@ -2,7 +2,7 @@
 
 Workspace quản lý thuế bằng tiếng Việt, được xây dựng độc lập từ các luồng nghiệp vụ của `original-tax` để thể hiện năng lực UI/UX và phát triển tính năng. Repo gốc chỉ được đọc tham khảo và không bị thay đổi.
 
-**Demo-site:** [visualize-tax.vercel.app](https://visualize-tax.vercel.app) · **Mã nguồn:** [toannguyen-ailogy/visualize-tax](https://github.com/toannguyen-ailogy/visualize-tax)
+**Demo-site:** [visualize-tax.vercel.app](https://visualize-tax.vercel.app) · **Mã nguồn:** [nhttoan0809/visualize-tax](https://github.com/nhttoan0809/visualize-tax)
 
 ## Trải nghiệm demo
 
@@ -109,7 +109,7 @@ Biến này chỉ cấu hình URL kiểm thử và không yêu cầu một serve
 
 ## GitHub và Vercel
 
-Production: [visualize-tax.vercel.app](https://visualize-tax.vercel.app), triển khai ngày 28/10/2026 qua Vercel CLI. Repository: [toannguyen-ailogy/visualize-tax](https://github.com/toannguyen-ailogy/visualize-tax), nhánh `main`, private. GitHub được cập nhật qua Git/GitHub API vì MCP chưa kết nối. Chưa bật Git auto-deploy; cập nhật mã nguồn trên GitHub không tự triển khai Vercel. Xem [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) để biết deployment, commit ứng dụng và kết quả kiểm tra trên URL thật.
+Production: [visualize-tax.vercel.app](https://visualize-tax.vercel.app), triển khai ngày 28/10/2026 qua Vercel CLI. Repository: [nhttoan0809/visualize-tax](https://github.com/nhttoan0809/visualize-tax), nhánh `main`, private. GitHub được cập nhật qua Git/GitHub API vì MCP chưa kết nối. Chưa bật Git auto-deploy; cập nhật mã nguồn trên GitHub không tự triển khai Vercel. Xem [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) để biết deployment, commit ứng dụng và kết quả kiểm tra trên URL thật.
 
 Màn Đối soát bắt đầu trống. Chọn **Đồng bộ & đối soát** để lưu snapshot giao dịch mẫu; bảng kết quả nằm ở đầu trang, click từng dòng mở popup kiểm tra hai nguồn: giấy báo Có/bản ghi ngân hàng mô phỏng và chứng từ hóa đơn dựng lại. Chuyển sang Dữ liệu trích xuất để đối chiếu từng trường; chọn giao dịch để xem lý do đã khớp hoặc lệch tiền. MST bên mua/bên chuyển và bên bán/bên nhận dùng chung định danh hư cấu; hai dòng lệch lần lượt 350.000 và 4.500.000 đồng. Đồng bộ lại không nhân bản giao dịch, reset xóa snapshot; dữ liệu lưu cũ chưa đồng bộ sẽ hiển thị danh sách trống.
 

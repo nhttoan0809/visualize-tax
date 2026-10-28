@@ -34,9 +34,9 @@ Các lần chạy trình diễn kiểm tra production dùng reduced motion. Bộ
 
 ## GitHub
 
-Repository: **https://github.com/toannguyen-ailogy/visualize-tax** · private · nhánh `main`.
+Repository: **https://github.com/nhttoan0809/visualize-tax** · private · nhánh `main`.
 
-Remote `origin`: `https://github.com/toannguyen-ailogy/visualize-tax.git`. Repository được tạo qua GitHub API và đồng bộ bằng Git trên tài khoản đã xác thực; MCP GitHub chưa kết nối. Không thay đổi remote hoặc nội dung của `original-tax`.
+Remote `origin`: `https://github.com/nhttoan0809/visualize-tax.git`. Repository được tạo qua GitHub API và đồng bộ bằng Git trên tài khoản đã xác thực; MCP GitHub chưa kết nối. Không thay đổi remote hoặc nội dung của `original-tax`.
 
 Chưa bật tự động deploy qua Git. Production hiện dùng commit ứng dụng `4b4268a`; các commit tài liệu sau đó không thay đổi ứng dụng đang chạy. Deploy bản ứng dụng tiếp theo bằng `vercel deploy --prod` từ project đã liên kết, hoặc cấu hình Git integration riêng khi cần.
 
